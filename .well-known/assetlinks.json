@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "io.github.rhythmdrum.twa",
-        "sha256_cert_fingerprints": ["E8:8F:E1:57:5C:57:04:26:7F:34:95:95:C8:97:AE:86:E2:93:80:62:09:CB:E7:DD:14:3A:0D:B0:F2:F7:48:4B"]
+        "sha256_cert_fingerprints": ["3B:E8:6A:C7:26:FF:96:93:D9:AB:1F:A9:E8:8D:AF:F9:CD:F5:84:DC:89:FD:8B:9B:6E:52:54:43:C9:F6:74:82"]
       }
     }]
