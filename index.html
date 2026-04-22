@@ -56,11 +56,11 @@ body.playing .cell.on-sn.current { background: #5ba3e8; border-color: #2a6ab0; b
 body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; box-shadow: none; }
 .cell.current:not(.on-bd):not(.on-sn):not(.on-hh)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 3px; }
 .group-div { width: 1px; background: #444; align-self: stretch; flex-shrink: 0; }
-.vol-row { display: flex; gap: 16px; padding: 12px 16px; border: 1px solid #444; border-radius: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-.vol-item { display: flex; align-items: center; gap: 8px; }
-.vol-item label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); width: 36px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
+.vol-row { display: flex; gap: 20px; padding: 10px 22px 16px; border: 1px solid #444; border-radius: 8px; margin-bottom: 12px; align-items: flex-start; }
+.vol-item { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+.vol-item label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-bottom: 2px; }
 .vol-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.vol-slider { width: 60px; }
+.vol-slider { width: 100% !important; min-width: 0; max-width: 100%; }
 .preset-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
 .preset-btn-wrap { flex: 1; position: relative; }
 .preset-btn {
@@ -110,7 +110,7 @@ body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; b
   <div class="vol-row">
     <div class="vol-item">
       <label style="color:var(--hh);"><span class="vol-dot" style="background:var(--hh);"></span>HH</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-hh" oninput="updateVol()">
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-hh" oninput="updateVol()">
     </div>
     <div class="vol-item">
       <label style="color:var(--sn);"><span class="vol-dot" style="background:var(--sn);"></span>SN</label>
@@ -118,9 +118,10 @@ body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; b
     </div>
     <div class="vol-item">
       <label style="color:var(--bd);"><span class="vol-dot" style="background:var(--bd);"></span>BD</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.9" id="vol-bd" oninput="updateVol()">
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-bd" oninput="updateVol()">
     </div>
   </div>
+
   <div class="footer">
     <button class="play-btn" id="play-btn" onclick="togglePlay()">
       <svg id="play-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -136,7 +137,7 @@ body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; b
 const LS_KEY = 'rhythmdrum_presets_v1';
 let audioCtx, isPlaying = false, currentStep = 0, timerID = null;
 let beatMode = 8, bpm = 120;
-let vols = { hh: 0.7, bd: 0.9, sn: 0.8 };
+let vols = { hh: 0.8, bd: 0.8, sn: 0.8 };
 let activePreset = 0;
 
 const DRUMS = [
@@ -157,11 +158,11 @@ const DEFAULT_PRESETS = [
   { bpm:100, 4:{hh:[1,0,1,0],sn:[0,1,0,1],bd:[1,0,1,0]}, 8:{hh:[1,0,1,1,1,0,1,0],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,1,0,0,1,0]}, 16:{hh:[1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0]} },
   { bpm:140, 4:{hh:[1,0,1,0],sn:[0,0,1,0],bd:[1,0,0,1]}, 8:{hh:[1,1,0,1,1,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,0,1,0,0]}, 16:{hh:[1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]} },
   { bpm:90,  4:{hh:[1,1,1,1],sn:[0,1,0,0],bd:[1,0,0,1]}, 8:{hh:[1,0,1,0,1,0,1,0],sn:[0,0,1,0,0,1,0,0],bd:[1,0,0,1,0,0,1,0]}, 16:{hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0]} },
-  { bpm:120, 4:{hh:[0,0,0,0],sn:[0,0,0,0],bd:[0,0,0,0]}, 8:{hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0)}, 16:{hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0)} },
+  { bpm:160, 4:{hh:[1,0,1,0],sn:[0,1,0,1],bd:[1,0,0,0]}, 8:{hh:[1,0,1,0,1,0,1,0],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,0,1,0,0]}, 16:{hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]} },
   { bpm:128, 4:{hh:[1,1,1,1],sn:[0,0,1,0],bd:[1,0,1,0]}, 8:{hh:[1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,0,0],bd:[1,0,1,0,1,0,1,0]}, 16:{hh:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,1,0,0,0,1,0,1,0,1,0,0,0,1,0]} },
   { bpm:110, 4:{hh:[1,0,0,1],sn:[0,1,0,1],bd:[1,0,1,0]}, 8:{hh:[1,0,1,0,0,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,1,0,0,1]}, 16:{hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0],bd:[1,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0]} },
   { bpm:95,  4:{hh:[1,1,0,1],sn:[0,0,1,0],bd:[1,0,0,0]}, 8:{hh:[1,1,0,1,1,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,1,0,0,0]}, 16:{hh:[1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]} },
-  { bpm:160, 4:{hh:[1,0,1,0],sn:[0,1,0,1],bd:[1,0,0,0]}, 8:{hh:[1,0,1,0,1,0,1,0],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,0,1,0,0]}, 16:{hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]} },
+  { bpm:120, 4:{hh:[0,0,0,0],sn:[0,0,0,0],bd:[0,0,0,0]}, 8:{hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0)}, 16:{hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0)} },
   { bpm:120, 4:{hh:[0,0,0,0],sn:[0,0,0,0],bd:[0,0,0,0]}, 8:{hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0)}, 16:{hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0)} },
 ];
 
@@ -509,7 +510,7 @@ function restoreSession() {
     bpm = s.bpm || 120;
     beatMode = s.beatMode || 4;
     activePreset = s.activePreset || 0;
-    vols = s.vols || { hh:0.7, bd:0.9, sn:0.8 };
+    vols = s.vols || { hh:0.8, bd:0.8, sn:0.8 };
     if (s.steps4)  { allSteps[4]  = { hh:s.steps4.hh.map(v=>!!v),  sn:s.steps4.sn.map(v=>!!v),  bd:s.steps4.bd.map(v=>!!v)  }; }
     if (s.steps8)  { allSteps[8]  = { hh:s.steps8.hh.map(v=>!!v),  sn:s.steps8.sn.map(v=>!!v),  bd:s.steps8.bd.map(v=>!!v)  }; }
     if (s.steps16) { allSteps[16] = { hh:s.steps16.hh.map(v=>!!v), sn:s.steps16.sn.map(v=>!!v), bd:s.steps16.bd.map(v=>!!v) }; }
