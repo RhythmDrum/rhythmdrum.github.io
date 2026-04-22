@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.rhythmdrum.twa",
+        "sha256_cert_fingerprints": ["E8:8F:E1:57:5C:57:04:26:7F:34:95:95:C8:97:AE:86:E2:93:80:62:09:CB:E7:DD:14:3A:0D:B0:F2:F7:48:4B"]
+      }
+    }]
