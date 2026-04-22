@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-title" content="RHYTHM DRUM">
+  <link rel="manifest" href="manifest.json">
+  <title>RHYTHM DRUM</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bd: #E24B4A; --sn: #378ADD; --hh: #1D9E75;
+  --bg-main: #1a1a1a; --bg-cell: #2e2e2e;
+  --text-primary: #f0ece0; --text-muted: #888; --accent: #EF9F27;
+}
+html { background: #000; }
+body { background: #000; min-height: 100dvh; }
+.rd-wrap { background: #000; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)) 20px; color: var(--text-primary); user-select: none; min-height: 100dvh; }
+.rd-led { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: background 0.05s, box-shadow 0.05s; display: inline-block; }
+.rd-led.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.controls-col { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; }
+.bpm-box { border: 1px solid #444; border-radius: 8px; padding: 7px 16px 10px; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.bpm-slider-row { display: flex; align-items: center; gap: 8px; width: 100%; margin-bottom: 0; }
+.ctrl-label { font-size: 10px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
+.beat-btns { display: flex; gap: 6px; justify-content: center; margin-top: 4px; }
+.beat-btn { background: var(--bg-cell); border: 1px solid #444; border-radius: 50%; color: var(--text-primary); font-size: 13px; width: 30px; height: 30px; cursor: pointer; transition: all 0.1s; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.beat-btn:hover { background: #3a3a3a; border-color: #666; }
+.beat-btn.selected { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
+.bpm-val { font-size: 22px; color: var(--text-primary); letter-spacing: 1px; line-height: 1; }
+.bpm-adj { width: 36px; height: 36px; border-radius: 3px; border: 1px solid #444; background: var(--bg-cell); color: var(--text-primary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.1s; }
+.bpm-adj:hover { background: #3a3a3a; border-color: #666; }
+.bpm-adj:active { background: var(--accent); color: #000; border-color: var(--accent); }
+input[type=range] { -webkit-appearance: none; width: 130px; height: 4px; background: #444; border-radius: 1px; outline: none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+.grid-section { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.drum-row { display: flex; align-items: center; gap: 8px; }
+.drum-label { width: 36px; display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+.drum-label-abbr { font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+.drum-dot { width: 8px; height: 8px; border-radius: 50%; }
+.cells-wrap { display: flex; gap: 4px; flex: 1; }
+.beat-group { display: flex; gap: 3px; flex: 1; }
+.cell { flex: 1; height: 42px; border-radius: 6px; background: var(--bg-cell); border: 1px solid #3a3a3a; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
+.cell:hover { border-color: #666; background: #363636; }
+.cell.on-bd { background: var(--bd); border-color: #c43d3d; }
+.cell.on-sn { background: var(--sn); border-color: #2a6ab0; }
+.cell.on-hh { background: #1D9E75; border-color: #147a5c; }
+body.playing .cell.on-bd { background: #8a2d2c; border-color: #7a2828; }
+body.playing .cell.on-sn { background: #1e4f7a; border-color: #1a4268; }
+body.playing .cell.on-hh { background: #0f5c42; border-color: #0d4e38; }
+body.playing .cell.on-bd.current { background: #ff6b6a; border-color: #c43d3d; box-shadow: none; }
+body.playing .cell.on-sn.current { background: #5ba3e8; border-color: #2a6ab0; box-shadow: none; }
+body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; box-shadow: none; }
+.cell.current:not(.on-bd):not(.on-sn):not(.on-hh)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 3px; }
+.group-div { width: 1px; background: #444; align-self: stretch; flex-shrink: 0; }
+.vol-row { display: flex; gap: 20px; padding: 10px 22px 16px; border: 1px solid #444; border-radius: 8px; margin-bottom: 12px; align-items: flex-start; }
+.vol-item { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+.vol-item label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-bottom: 2px; }
+.vol-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.vol-slider { width: 100% !important; min-width: 0; max-width: 100%; }
+.preset-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
+.preset-btn-wrap { flex: 1; position: relative; }
+.preset-btn {
+  width: 100%; background: var(--bg-cell); border: 1px solid #444; border-radius: 4px;
+  color: var(--text-muted); font-size: 11px;
+  letter-spacing: 1px; padding: 8px 4px; cursor: pointer;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+  text-align: center; position: relative; overflow: hidden;
+  -webkit-tap-highlight-color: transparent; touch-action: none;
+}
+.preset-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(239,159,39,0.08); }
+.preset-btn.holding { border-color: #E24B4A !important; color: #E24B4A !important; }
+.hold-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: #E24B4A; width: 0%; border-radius: 0 0 4px 4px; pointer-events: none; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 8px 18px; font-size: 12px; color: var(--text-primary); letter-spacing: 1px; opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap; z-index: 99; }
+.toast.show { opacity: 1; }
+.footer { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 12px; }
+.rd-title { font-size: 22px; letter-spacing:1.5px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.play-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); }
+@media (orientation: landscape) and (max-height: 500px) {
+  .rd-wrap {
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: auto;
+    column-gap: 14px;
+    align-items: start;
+    min-height: 100dvh;
+  }
+  /* プリセット行：左カラム全幅 */
+  .rd-wrap > div:first-child { grid-column: 1; grid-row: 1; }
+  #preset-row { grid-column: 1; grid-row: 2; margin-bottom: 8px; }
+  /* コントロール（BPM＋ビートボタン）：左カラム */
+  .controls-col { grid-column: 1; grid-row: 3; margin-bottom: 8px; }
+  /* グリッド：右カラム、全行にまたがる */
+  #grid-section { grid-column: 2; grid-row: 1 / 6; margin-bottom: 0; align-self: center; }
+  /* ボリューム：左カラム */
+  .vol-row { grid-column: 1; grid-row: 4; margin-bottom: 8px; padding: 8px 12px 12px; gap: 12px; }
+  /* フッター：左カラム */
+  .footer { grid-column: 1; grid-row: 5; flex-direction: row; justify-content: center; padding-top: 4px; gap: 14px; }
+  /* セルを少し小さく */
+  .cell { height: 32px; }
+  /* BPMフォント縮小 */
+  .bpm-val { font-size: 18px; }
+  /* プリセットボタンを1行に */
+  #preset-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .preset-btn-wrap { flex: 1 1 16%; min-width: 0; }
+  .preset-btn { padding: 5px 2px; font-size: 10px; }
+  /* タイトル縮小 */
+  .rd-title { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="rd-wrap">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+    <span style="font-size:9px; letter-spacing:1.5px; color:var(--text-muted); text-transform:uppercase;">Preset</span>
+    <span style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Long-press to save</span>
+  </div>
+  <div class="preset-row" id="preset-row"></div>
+  <div class="controls-col">
+    <div class="bpm-box">
+      <span class="bpm-val" id="bpm-val" style="margin-bottom:0;">120</span>
+      <div class="bpm-slider-row" style="margin-top:0;">
+        <button class="bpm-adj" id="bpm-dec">−</button>
+        <input type="range" min="40" max="240" value="120" step="1" id="bpm-slider" oninput="setBPM(this.value)" style="flex:1;"/>
+        <button class="bpm-adj" id="bpm-inc">+</button>
+      </div>
+      <span class="ctrl-label" style="text-align:center; margin-top:0;">BPM</span>
+    </div>
+    <div class="beat-btns">
+      <button class="beat-btn" onclick="setBeat(4,this)">4</button>
+      <button class="beat-btn selected" onclick="setBeat(8,this)">8</button>
+      <button class="beat-btn" onclick="setBeat(16,this)">16</button>
+    </div>
+  </div>
+  <div class="grid-section" id="grid-section"></div>
+  <div class="vol-row">
+    <div class="vol-item">
+      <label style="color:var(--hh);"><span class="vol-dot" style="background:var(--hh);"></span>HH</label>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-hh" oninput="updateVol()">
+    </div>
+    <div class="vol-item">
+      <label style="color:var(--sn);"><span class="vol-dot" style="background:var(--sn);"></span>SN</label>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-sn" oninput="updateVol()">
+    </div>
+    <div class="vol-item">
+      <label style="color:var(--bd);"><span class="vol-dot" style="background:var(--bd);"></span>BD</label>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-bd" oninput="updateVol()">
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="play-btn" id="play-btn" onclick="togglePlay()">
+      <svg id="play-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <polygon points="5,2 18,10 5,18"/>
+      </svg>
+    </button>
+    <div class="rd-title">RHYTHM DRUM <span class="rd-led" id="beat-led"></span></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const LS_KEY = 'rhythmdrum_presets_v1';
+let audioCtx, isPlaying = false, currentStep = 0, timerID = null;
+let beatMode = 8, bpm = 120;
+let vols = { hh: 0.8, bd: 0.8, sn: 0.8 };
+let activePreset = 0;
+
+const DRUMS = [
+  { id: 'hh', label: 'HH', color: '#1D9E75' },
+  { id: 'sn', label: 'SN', color: '#378ADD' },
+  { id: 'bd', label: 'BD', color: '#E24B4A' },
+];
+const BEAT_STEPS = { 4: 4, 8: 8, 16: 16 };
+
+const allSteps = {
+  4:  { hh: Array(4).fill(false),  sn: Array(4).fill(false),  bd: Array(4).fill(false) },
+  8:  { hh: Array(8).fill(false),  sn: Array(8).fill(false),  bd: Array(8).fill(false) },
+  16: { hh: Array(16).fill(false), sn: Array(16).fill(false), bd: Array(16).fill(false) },
+};
+
+const DEFAULT_PRESETS = [
+  { bpm:120, 4:{hh:[1,1,1,1],sn:[0,0,1,0],bd:[1,0,0,0]}, 8:{hh:[1,1,1,1,1,1,1,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,1,0,0,0]}, 16:{hh:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0]} },
+  { bpm:100, 4:{hh:[1,0,1,0],sn:[0,1,0,1],bd:[1,0,1,0]}, 8:{hh:[1,0,1,1,1,0,1,0],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,1,0,0,1,0]}, 16:{hh:[1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0]} },
+  { bpm:140, 4:{hh:[1,0,1,0],sn:[0,0,1,0],bd:[1,0,0,1]}, 8:{hh:[1,1,0,1,1,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,0,1,0,0]}, 16:{hh:[1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]} },
+  { bpm:90,  4:{hh:[1,1,1,1],sn:[0,1,0,0],bd:[1,0,0,1]}, 8:{hh:[1,0,1,0,1,0,1,0],sn:[0,0,1,0,0,1,0,0],bd:[1,0,0,1,0,0,1,0]}, 16:{hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0]} },
+  { bpm:160, 4:{hh:[1,0,1,0],sn:[0,1,0,1],bd:[1,0,0,0]}, 8:{hh:[1,0,1,0,1,0,1,0],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,0,1,0,0]}, 16:{hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]} },
+  { bpm:128, 4:{hh:[1,1,1,1],sn:[0,0,1,0],bd:[1,0,1,0]}, 8:{hh:[1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,0,0],bd:[1,0,1,0,1,0,1,0]}, 16:{hh:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,1,0,0,0,1,0,1,0,1,0,0,0,1,0]} },
+  { bpm:110, 4:{hh:[1,0,0,1],sn:[0,1,0,1],bd:[1,0,1,0]}, 8:{hh:[1,0,1,0,0,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,1,0,0,1]}, 16:{hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0],bd:[1,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0]} },
+  { bpm:95,  4:{hh:[1,1,0,1],sn:[0,0,1,0],bd:[1,0,0,0]}, 8:{hh:[1,1,0,1,1,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,1,0,0,0]}, 16:{hh:[1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]} },
+  { bpm:120, 4:{hh:[0,0,0,0],sn:[0,0,0,0],bd:[0,0,0,0]}, 8:{hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0)}, 16:{hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0)} },
+  { bpm:120, 4:{hh:[0,0,0,0],sn:[0,0,0,0],bd:[0,0,0,0]}, 8:{hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0)}, 16:{hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0)} },
+];
+
+function loadFromStorage() {
+  try { const r = localStorage.getItem(LS_KEY); if (r) return JSON.parse(r); } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+}
+function saveToStorage() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(savedPresets)); } catch(e) {}
+}
+let savedPresets = loadFromStorage();
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+const HOLD_DURATION = 800;
+let holdTimers = {};
+let holdIntervals = {};
+let holdFired = {};
+
+function buildPresetRow() {
+  const container = document.getElementById('preset-row');
+  container.innerHTML = '';
+  [0, 1].forEach(rowIdx => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; gap:6px; width:100%;';
+    for (let col = 0; col < 5; col++) {
+      const i = rowIdx * 5 + col;
+      const wrap = document.createElement('div');
+      wrap.className = 'preset-btn-wrap';
+
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn' + (i === activePreset ? ' active' : '');
+      btn.id = `preset-btn-${i}`;
+      btn.textContent = (i + 1) < 10 ? '0' + (i + 1) : '' + (i + 1);
+
+      const bar = document.createElement('div');
+      bar.className = 'hold-bar';
+      bar.id = `hold-bar-${i}`;
+      btn.appendChild(bar);
+
+      const startHold = (e) => {
+        holdFired[i] = false;
+        let elapsed = 0;
+        const bar = document.getElementById(`hold-bar-${i}`);
+        btn.classList.add('holding');
+        bar.style.width = '0%';
+        holdIntervals[i] = setInterval(() => {
+          elapsed += 30;
+          bar.style.width = Math.min((elapsed / HOLD_DURATION) * 100, 100) + '%';
+          if (elapsed >= HOLD_DURATION) {
+            clearInterval(holdIntervals[i]);
+            holdIntervals[i] = null;
+            holdFired[i] = true;
+            savePreset(i);
+            btn.classList.remove('holding');
+            bar.style.width = '0%';
+          }
+        }, 30);
+      };
+
+      const endHold = () => {
+        if (holdIntervals[i]) {
+          clearInterval(holdIntervals[i]);
+          holdIntervals[i] = null;
+        }
+        const bar = document.getElementById(`hold-bar-${i}`);
+        btn.classList.remove('holding');
+        bar.style.width = '0%';
+      };
+
+      btn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(e); }, { passive: false });
+      btn.addEventListener('touchend', (e) => { e.preventDefault(); endHold(); if (!holdFired[i]) loadPreset(i); }, { passive: false });
+      btn.addEventListener('touchcancel', endHold);
+      btn.addEventListener('mousedown', startHold);
+      btn.addEventListener('mouseup', (e) => { const wasFired = holdFired[i]; endHold(); if (!wasFired) loadPreset(i); });
+      btn.addEventListener('mouseleave', endHold);
+
+      wrap.appendChild(btn);
+      row.appendChild(wrap);
+    }
+    container.appendChild(row);
+  });
+}
+
+function savePreset(idx) {
+  savedPresets[idx] = {
+    bpm,
+    4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd]  },
+    8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd]  },
+    16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd] },
+  };
+  saveToStorage();
+  showToast('SAVED TO 0' + (idx + 1));
+  const btn = document.getElementById(`preset-btn-${idx}`);
+  btn.style.background = 'rgba(29,158,117,0.2)';
+  btn.style.borderColor = '#1D9E75';
+  setTimeout(() => { btn.style.background = ''; btn.style.borderColor = ''; }, 600);
+}
+
+function loadPreset(idx) {
+  activePreset = idx;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`preset-btn-${idx}`).classList.add('active');
+  const p = savedPresets[idx];
+  bpm = p.bpm;
+  document.getElementById('bpm-val').textContent = bpm;
+  document.getElementById('bpm-slider').value = bpm;
+  [4, 8, 16].forEach(mode => {
+    ['hh','sn','bd'].forEach(d => { allSteps[mode][d] = p[mode][d].map(v => !!v); });
+  });
+  if (isPlaying) { clearInterval(timerID); currentStep = 0; startTimer(); }
+  buildGrid();
+}
+
+function currentSteps() { return allSteps[beatMode]; }
+function getStepCount() { return BEAT_STEPS[beatMode]; }
+
+function buildGrid() {
+  const n = getStepCount();
+  const steps = currentSteps();
+  const section = document.getElementById('grid-section');
+  section.innerHTML = '';
+  DRUMS.forEach(drum => {
+    const row = document.createElement('div');
+    row.className = 'drum-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'drum-label';
+    lbl.innerHTML = `<span class="drum-label-abbr" style="color:${drum.color}">${drum.label}</span><div class="drum-dot" style="background:${drum.color}"></div>`;
+    row.appendChild(lbl);
+    lbl.style.display = 'none';
+    const wrap = document.createElement('div');
+    wrap.className = 'cells-wrap';
+    const groupSize = beatMode === 4 ? 1 : (beatMode === 8 ? 2 : 4);
+    const numGroups = n / groupSize;
+    for (let g = 0; g < numGroups; g++) {
+      if (g === numGroups / 2) { const div = document.createElement('div'); div.className = 'group-div'; wrap.appendChild(div); }
+      const grp = document.createElement('div');
+      grp.className = 'beat-group';
+      for (let i = 0; i < groupSize; i++) {
+        const stepIdx = g * groupSize + i;
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.id = `cell-${drum.id}-${stepIdx}`;
+        if (steps[drum.id][stepIdx]) cell.classList.add(`on-${drum.id}`);
+        cell.onclick = () => toggleCell(drum.id, stepIdx);
+        grp.appendChild(cell);
+      }
+      wrap.appendChild(grp);
+    }
+    row.appendChild(wrap);
+    section.appendChild(row);
+  });
+}
+
+function toggleCell(drumId, stepIdx) {
+  const steps = currentSteps();
+  steps[drumId][stepIdx] = !steps[drumId][stepIdx];
+  const cell = document.getElementById(`cell-${drumId}-${stepIdx}`);
+  if (steps[drumId][stepIdx]) cell.classList.add(`on-${drumId}`);
+  else cell.classList.remove(`on-${drumId}`);
+}
+
+function updateVol() {
+  vols.hh = parseFloat(document.getElementById('vol-hh').value);
+  vols.bd = parseFloat(document.getElementById('vol-bd').value);
+  vols.sn = parseFloat(document.getElementById('vol-sn').value);
+}
+
+function setBeat(n, btn) {
+  document.querySelectorAll('.beat-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  beatMode = n; currentStep = 0; buildGrid();
+}
+
+function setBPM(v) {
+  bpm = Math.min(240, Math.max(40, parseInt(v)));
+  document.getElementById('bpm-val').textContent = bpm;
+  document.getElementById('bpm-slider').value = bpm;
+  if (isPlaying) { clearTimeout(timerID); startTimer(); }
+}
+
+function getStepInterval() {
+  const bps = bpm / 60;
+  if (beatMode === 4) return 1000 / bps;
+  if (beatMode === 8) return 500 / bps;
+  return 250 / bps;
+}
+
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playKick(t) {
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(vols.bd*1.2,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+  g.connect(audioCtx.destination);
+  const osc = audioCtx.createOscillator();
+  osc.frequency.setValueAtTime(160,t); osc.frequency.exponentialRampToValueAtTime(40,t+0.15);
+  osc.connect(g); osc.start(t); osc.stop(t+0.5);
+  const noise = audioCtx.createBufferSource();
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.05,audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.3;
+  noise.buffer=buf;
+  const ng = audioCtx.createGain();
+  ng.gain.setValueAtTime(vols.bd*0.4,t); ng.gain.exponentialRampToValueAtTime(0.001,t+0.05);
+  noise.connect(ng); ng.connect(audioCtx.destination); noise.start(t);
+}
+
+function playSnare(t) {
+  const noise = audioCtx.createBufferSource();
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.2,audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  noise.buffer=buf;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type='highpass'; filter.frequency.value=1000;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(vols.sn*0.8,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+  noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination); noise.start(t);
+  const osc = audioCtx.createOscillator();
+  osc.frequency.setValueAtTime(200,t); osc.frequency.exponentialRampToValueAtTime(100,t+0.1);
+  const og = audioCtx.createGain();
+  og.gain.setValueAtTime(vols.sn*0.5,t); og.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+  osc.connect(og); og.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.1);
+}
+
+function playHihat(t) {
+  const noise = audioCtx.createBufferSource();
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.08,audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  noise.buffer=buf;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type='highpass'; filter.frequency.value=7000;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(vols.hh*0.6,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+  noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination); noise.start(t);
+}
+
+// Lookahead scheduler - schedules audio ahead of time for accurate timing
+const LOOKAHEAD = 0.1;    // seconds to schedule ahead
+const SCHEDULE_INTERVAL = 25; // ms between scheduler runs
+
+let nextStepTime = 0;
+
+function scheduleStep(stepIdx, time) {
+  const steps = currentSteps();
+  if(steps.bd[stepIdx]) playKick(time);
+  if(steps.sn[stepIdx]) playSnare(time);
+  if(steps.hh[stepIdx]) playHihat(time);
+
+  // Schedule UI update to fire when audio actually plays
+  const delay = (time - audioCtx.currentTime) * 1000;
+  const thisStep = stepIdx;
+  const stepDuration = getStepInterval();
+  setTimeout(() => {
+    const led = document.getElementById('beat-led');
+    DRUMS.forEach(drum => { const cell = document.getElementById(`cell-${drum.id}-${thisStep}`); if(cell) cell.classList.add('current'); });
+    led.classList.add('active');
+    setTimeout(() => {
+      DRUMS.forEach(drum => { const cell = document.getElementById(`cell-${drum.id}-${thisStep}`); if(cell) cell.classList.remove('current'); });
+      led.classList.remove('active');
+    }, Math.min(stepDuration * 0.8, 120));
+  }, Math.max(0, delay));
+}
+
+function scheduler() {
+  const n = getStepCount();
+  const stepSecs = getStepInterval() / 1000;
+  while (nextStepTime < audioCtx.currentTime + LOOKAHEAD) {
+    scheduleStep(currentStep, nextStepTime);
+    nextStepTime += stepSecs;
+    currentStep = (currentStep + 1) % n;
+  }
+  timerID = setTimeout(scheduler, SCHEDULE_INTERVAL);
+}
+
+function startTimer() {
+  nextStepTime = audioCtx.currentTime + 0.05;
+  scheduler();
+}
+// Wake Lock - prevent screen from sleeping during playback
+let wakeLock = null;
+async function acquireWakeLock() {
+  if ('wakeLock' in navigator) {
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+  }
+}
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+}
+// Re-acquire wake lock if screen was briefly locked
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && isPlaying) acquireWakeLock();
+});
+
+function togglePlay() {
+  initAudio();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('play-btn');
+  const icon = document.getElementById('play-icon');
+  if(isPlaying) {
+    btn.classList.add('playing');
+    document.body.classList.add('playing');
+    icon.innerHTML = '<rect x="3" y="2" width="5" height="16" rx="1"/><rect x="12" y="2" width="5" height="16" rx="1"/>';
+    currentStep = 0; startTimer();
+    acquireWakeLock();
+  } else {
+    btn.classList.remove('playing');
+    document.body.classList.remove('playing');
+    icon.innerHTML = '<polygon points="5,2 18,10 5,18"/>';
+    clearTimeout(timerID);
+    document.querySelectorAll('.cell').forEach(c => c.classList.remove('current'));
+    document.getElementById('beat-led').classList.remove('active');
+    releaseWakeLock();
+  }
+}
+
+const SESSION_KEY = 'rhythmdrum_session_v1';
+
+function saveSession() {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      bpm, beatMode, activePreset,
+      vols,
+      steps4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd]  },
+      steps8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd]  },
+      steps16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd] },
+    }));
+  } catch(e) {}
+}
+
+function restoreSession() {
+  try {
+    const r = localStorage.getItem(SESSION_KEY);
+    if (!r) return false;
+    const s = JSON.parse(r);
+    bpm = s.bpm || 120;
+    beatMode = s.beatMode || 4;
+    activePreset = s.activePreset || 0;
+    vols = s.vols || { hh:0.8, bd:0.8, sn:0.8 };
+    if (s.steps4)  { allSteps[4]  = { hh:s.steps4.hh.map(v=>!!v),  sn:s.steps4.sn.map(v=>!!v),  bd:s.steps4.bd.map(v=>!!v)  }; }
+    if (s.steps8)  { allSteps[8]  = { hh:s.steps8.hh.map(v=>!!v),  sn:s.steps8.sn.map(v=>!!v),  bd:s.steps8.bd.map(v=>!!v)  }; }
+    if (s.steps16) { allSteps[16] = { hh:s.steps16.hh.map(v=>!!v), sn:s.steps16.sn.map(v=>!!v), bd:s.steps16.bd.map(v=>!!v) }; }
+    return true;
+  } catch(e) { return false; }
+}
+
+buildPresetRow();
+
+if (restoreSession()) {
+  // UIに反映
+  document.getElementById('bpm-val').textContent = bpm;
+  document.getElementById('bpm-slider').value = bpm;
+  document.getElementById('vol-hh').value = vols.hh;
+  document.getElementById('vol-sn').value = vols.sn;
+  document.getElementById('vol-bd').value = vols.bd;
+  document.querySelectorAll('.beat-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.textContent) === beatMode);
+  });
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`preset-btn-${activePreset}`).classList.add('active');
+  buildGrid();
+} else {
+  loadPreset(0);
+}
+
+// 変更のたびにセッションを保存
+window.addEventListener('beforeunload', saveSession);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') saveSession();
+  if (document.visibilityState === 'visible' && isPlaying) acquireWakeLock();
+});
+
+// BPM long-press repeat
+function setupBpmBtn(btnId, delta) {
+  const btn = document.getElementById(btnId);
+  let holdTimer = null;
+  let repeatTimer = null;
+
+  function start() {
+    setBPM(bpm + delta);
+    holdTimer = setTimeout(() => {
+      repeatTimer = setInterval(() => setBPM(bpm + delta), 60);
+    }, 400);
+  }
+  function stop() {
+    clearTimeout(holdTimer);
+    clearInterval(repeatTimer);
+    holdTimer = null; repeatTimer = null;
+  }
+
+  btn.addEventListener('mousedown', start);
+  btn.addEventListener('touchstart', (e) => { e.preventDefault(); start(); }, { passive: false });
+  btn.addEventListener('mouseup', stop);
+  btn.addEventListener('mouseleave', stop);
+  btn.addEventListener('touchend', stop);
+  btn.addEventListener('touchcancel', stop);
+}
+setupBpmBtn('bpm-dec', -1);
+setupBpmBtn('bpm-inc', +1);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+</body>
+</html>
