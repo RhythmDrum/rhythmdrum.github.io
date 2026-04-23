@@ -15,6 +15,7 @@
 :root {
   --bd: #E24B4A; --sn: #378ADD; --hh: #1D9E75;
   --ht: #A855F7; --lt: #EC4899; --cy: #F59E0B;
+  --rd: #06B6D4; --ft: #F97316;
   --bg-main: #1a1a1a; --bg-cell: #2e2e2e;
   --text-primary: #f0ece0; --text-muted: #888; --accent: #EF9F27;
 }
@@ -37,40 +38,94 @@ body { background: transparent; background-color:#000;}
 .bpm-adj:active { background: var(--accent); color: #000; border-color: var(--accent); }
 input[type=range] { -webkit-appearance: none; width: 130px; height: 4px; background: #444; border-radius: 2px; outline: none; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-.grid-section { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+#bpm-slider::-webkit-slider-thumb { background: var(--accent); }
+.grid-section { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .drum-row { display: flex; align-items: center; gap: 8px; }
 .drum-label { width: 36px; display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
 .drum-label-abbr { font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
 .drum-dot { width: 8px; height: 8px; border-radius: 50%; }
 .cells-wrap { display: flex; gap: 4px; flex: 1; }
 .beat-group { display: flex; gap: 3px; flex: 1; }
-.cell { flex: 1; height: 38px; border-radius: 6px; background: var(--bg-cell); border: 1px solid #3a3a3a; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
+.cell { flex: 1; height: 27px; border-radius: 5px; background: var(--bg-cell); border: 1px solid #3a3a3a; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
 .cell:hover { border-color: #666; background: #363636; }
 .cell.on-bd { background: var(--bd); border-color: #c43d3d; }
 .cell.on-sn { background: var(--sn); border-color: #2a6ab0; }
+.cell.on-sn-rim { background: #60a5fa; border-color: var(--sn); outline: 2px solid var(--sn); outline-offset: -4px; }
 .cell.on-hh { background: #1D9E75; border-color: #147a5c; }
+.cell.on-hh-open { background: #2ecc71; border-color: #1D9E75; outline: 2px solid #1D9E75; outline-offset: -4px; }
 .cell.on-ht { background: var(--ht); border-color: #7c3aed; }
 .cell.on-lt { background: var(--lt); border-color: #be185d; }
 .cell.on-cy { background: var(--cy); border-color: #d97706; }
+.cell.on-rd { background: var(--rd); border-color: #0891b2; }
+.cell.on-ft { background: var(--ft); border-color: #ea580c; }
 body.playing .cell.on-bd { background: #8a2d2c; border-color: #7a2828; }
 body.playing .cell.on-sn { background: #1e4f7a; border-color: #1a4268; }
+body.playing .cell.on-sn-rim { background: #1e4f7a; border-color: var(--sn); outline: 2px solid var(--sn); outline-offset: -4px; }
 body.playing .cell.on-hh { background: #0f5c42; border-color: #0d4e38; }
+body.playing .cell.on-hh-open { background: #1a7a4a; border-color: #1D9E75; outline: 2px solid #1D9E75; outline-offset: -4px; }
 body.playing .cell.on-ht { background: #5b21b6; border-color: #4c1d95; }
 body.playing .cell.on-lt { background: #9d174d; border-color: #831843; }
 body.playing .cell.on-cy { background: #92400e; border-color: #78350f; }
+body.playing .cell.on-rd { background: #0e5f75; border-color: #0891b2; }
+body.playing .cell.on-ft { background: #9a3412; border-color: #ea580c; }
 body.playing .cell.on-bd.current { background: #ff6b6a; border-color: #c43d3d; box-shadow: none; }
 body.playing .cell.on-sn.current { background: #5ba3e8; border-color: #2a6ab0; box-shadow: none; }
+body.playing .cell.on-sn-rim.current { background: #93c5fd; border-color: var(--sn); box-shadow: none; }
 body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; box-shadow: none; }
+body.playing .cell.on-hh-open.current { background: #5fffb0; border-color: #1D9E75; box-shadow: none; }
 body.playing .cell.on-ht.current { background: #c084fc; border-color: #7c3aed; box-shadow: none; }
 body.playing .cell.on-lt.current { background: #f472b6; border-color: #be185d; box-shadow: none; }
 body.playing .cell.on-cy.current { background: #fcd34d; border-color: #d97706; box-shadow: none; }
-.cell.current:not(.on-bd):not(.on-sn):not(.on-hh):not(.on-ht):not(.on-lt):not(.on-cy)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 5px; }
+body.playing .cell.on-rd.current { background: #67e8f9; border-color: #0891b2; box-shadow: none; }
+body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; box-shadow: none; }
+.cell.current:not(.on-bd):not(.on-sn):not(.on-sn-rim):not(.on-hh):not(.on-hh-open):not(.on-ht):not(.on-lt):not(.on-cy):not(.on-rd):not(.on-ft)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 5px; }
 .group-div { width: 1px; background: #444; align-self: stretch; flex-shrink: 0; }
-.vol-row { display: flex; gap: 16px; padding-top: 12px; border-top: 1px solid #333; flex-wrap: wrap; margin-bottom: 14px; }
-.vol-item { display: flex; align-items: center; gap: 8px; }
-.vol-item label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); width: 36px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
-.vol-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.vol-slider { width: 80px; }
+.vol-row { display: flex; padding: 12px 8px 10px; border: 1px solid #444; border-radius: 10px; margin-bottom: 14px; justify-content: space-around; align-items: flex-end; width: 100%; box-sizing: border-box; }
+.vol-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+.vol-item label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.vol-dot { display: none; }
+/* Custom vertical slider */
+.vol-slider-wrap {
+  position: relative;
+  width: 20px;
+  height: 70px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+.vol-track {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 100%;
+  background: #444;
+  border-radius: 2px;
+}
+.vol-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #666;
+  border-radius: 2px;
+}
+.vol-thumb {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  bottom: 0;
+  transition: box-shadow 0.1s;
+}
+.vol-thumb:hover { box-shadow: 0 0 8px rgba(0,0,0,0.8); }
+.vol-slider { display: none; }
 .preset-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 16px; }
 .preset-btn-wrap { position: relative; }
 .preset-btn {
@@ -86,7 +141,7 @@ body.playing .cell.on-cy.current { background: #fcd34d; border-color: #d97706; b
 .hold-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: #E24B4A; width: 0%; border-radius: 0 0 8px 8px; pointer-events: none; }
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 8px 18px; font-size: 12px; color: var(--text-primary); letter-spacing: 1px; opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap; z-index: 99; }
 .toast.show { opacity: 1; }
-.footer { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid #333; }
+.footer { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 14px; }
 .dm-title { font-size: 22px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
 .play-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); }
 .play-btn:hover { background: rgba(239,159,39,0.1); }
@@ -110,33 +165,74 @@ body.playing .cell.on-cy.current { background: #fcd34d; border-color: #d97706; b
       <button class="beat-btn selected" onclick="setBeat(4,this)">4</button>
       <button class="beat-btn" onclick="setBeat(8,this)">8</button>
       <button class="beat-btn" onclick="setBeat(16,this)">16</button>
+      <button class="beat-btn" onclick="setBeat(32,this)">32</button>
     </div>
   </div>
   <div class="grid-section" id="grid-section"></div>
   <div class="vol-row">
     <div class="vol-item">
-      <label style="color:var(--cy);"><span class="vol-dot" style="background:var(--cy);"></span>CY</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.6" id="vol-cy" oninput="updateVol()">
+      <div class="vol-slider-wrap" data-vol="cy" data-color="var(--cy)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--cy);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.6" id="vol-cy">
+      <label style="color:var(--cy);">CY</label>
     </div>
     <div class="vol-item">
-      <label style="color:var(--hh);"><span class="vol-dot" style="background:var(--hh);"></span>HH</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-hh" oninput="updateVol()">
+      <div class="vol-slider-wrap" data-vol="rd" data-color="var(--rd)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--rd);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.6" id="vol-rd">
+      <label style="color:var(--rd);">RD</label>
     </div>
     <div class="vol-item">
-      <label style="color:var(--ht);"><span class="vol-dot" style="background:var(--ht);"></span>HT</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-ht" oninput="updateVol()">
+      <div class="vol-slider-wrap" data-vol="hh" data-color="var(--hh)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--hh);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-hh">
+      <label style="color:var(--hh);">HH</label>
     </div>
     <div class="vol-item">
-      <label style="color:var(--lt);"><span class="vol-dot" style="background:var(--lt);"></span>LT</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-lt" oninput="updateVol()">
+      <div class="vol-slider-wrap" data-vol="ht" data-color="var(--ht)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--ht);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-ht">
+      <label style="color:var(--ht);">HT</label>
     </div>
     <div class="vol-item">
-      <label style="color:var(--sn);"><span class="vol-dot" style="background:var(--sn);"></span>SN</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-sn" oninput="updateVol()">
+      <div class="vol-slider-wrap" data-vol="lt" data-color="var(--lt)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--lt);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-lt">
+      <label style="color:var(--lt);">LT</label>
     </div>
     <div class="vol-item">
-      <label style="color:var(--bd);"><span class="vol-dot" style="background:var(--bd);"></span>BD</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.9" id="vol-bd" oninput="updateVol()">
+      <div class="vol-slider-wrap" data-vol="sn" data-color="var(--sn)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--sn);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-sn">
+      <label style="color:var(--sn);">SN</label>
+    </div>
+    <div class="vol-item">
+      <div class="vol-slider-wrap" data-vol="ft" data-color="var(--ft)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--ft);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-ft">
+      <label style="color:var(--ft);">FT</label>
+    </div>
+    <div class="vol-item">
+      <div class="vol-slider-wrap" data-vol="bd" data-color="var(--bd)">
+        <div class="vol-track"><div class="vol-fill"></div></div>
+        <div class="vol-thumb" style="background:var(--bd);"></div>
+      </div>
+      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.9" id="vol-bd">
+      <label style="color:var(--bd);">BD</label>
     </div>
   </div>
   <div class="footer">
@@ -151,69 +247,82 @@ body.playing .cell.on-cy.current { background: #fcd34d; border-color: #d97706; b
 <div class="toast" id="toast"></div>
 
 <script>
-const LS_KEY = 'drummachine_presets_v3';
+const LS_KEY = 'drummachine_presets_v5';
 let audioCtx, isPlaying = false, currentStep = 0, timerID = null;
 let beatMode = 4, bpm = 120;
-let vols = { hh: 0.7, bd: 0.9, sn: 0.8, ht: 0.7, lt: 0.7, cy: 0.6 };
+let vols = { hh: 0.7, bd: 0.9, sn: 0.8, ht: 0.7, lt: 0.7, cy: 0.6, rd: 0.6, ft: 0.7 };
 let activePreset = 0;
 
 const DRUMS = [
   { id: 'cy', label: 'CY', color: '#F59E0B' },
+  { id: 'rd', label: 'RD', color: '#06B6D4' },
   { id: 'hh', label: 'HH', color: '#1D9E75' },
   { id: 'ht', label: 'HT', color: '#A855F7' },
   { id: 'lt', label: 'LT', color: '#EC4899' },
   { id: 'sn', label: 'SN', color: '#378ADD' },
+  { id: 'ft', label: 'FT', color: '#F97316' },
   { id: 'bd', label: 'BD', color: '#E24B4A' },
 ];
-const BEAT_STEPS = { 4: 4, 8: 8, 16: 16 };
+const BEAT_STEPS = { 4: 4, 8: 8, 16: 16, 32: 32 };
 
 const allSteps = {
-  4:  { hh: Array(4).fill(false),  sn: Array(4).fill(false),  bd: Array(4).fill(false),  ht: Array(4).fill(false),  lt: Array(4).fill(false),  cy: Array(4).fill(false)  },
-  8:  { hh: Array(8).fill(false),  sn: Array(8).fill(false),  bd: Array(8).fill(false),  ht: Array(8).fill(false),  lt: Array(8).fill(false),  cy: Array(8).fill(false)  },
-  16: { hh: Array(16).fill(false), sn: Array(16).fill(false), bd: Array(16).fill(false), ht: Array(16).fill(false), lt: Array(16).fill(false), cy: Array(16).fill(false) },
+  4:  { hh: Array(4).fill(0),  sn: Array(4).fill(0),  bd: Array(4).fill(false),  ht: Array(4).fill(false),  lt: Array(4).fill(false),  cy: Array(4).fill(false),  rd: Array(4).fill(false),  ft: Array(4).fill(false)  },
+  8:  { hh: Array(8).fill(0),  sn: Array(8).fill(0),  bd: Array(8).fill(false),  ht: Array(8).fill(false),  lt: Array(8).fill(false),  cy: Array(8).fill(false),  rd: Array(8).fill(false),  ft: Array(8).fill(false)  },
+  16: { hh: Array(16).fill(0), sn: Array(16).fill(0), bd: Array(16).fill(false), ht: Array(16).fill(false), lt: Array(16).fill(false), cy: Array(16).fill(false), rd: Array(16).fill(false), ft: Array(16).fill(false) },
+  32: { hh: Array(32).fill(0), sn: Array(32).fill(0), bd: Array(32).fill(false), ht: Array(32).fill(false), lt: Array(32).fill(false), cy: Array(32).fill(false), rd: Array(32).fill(false), ft: Array(32).fill(false) },
 };
 
 const DEFAULT_PRESETS = [
   { bpm:120,
-    4:  { hh:[1,1,1,1],sn:[0,0,1,0],bd:[1,0,0,0],ht:[0,0,0,1],lt:[0,0,0,0],cy:[1,0,0,0] },
-    8:  { hh:[1,1,1,1,1,1,1,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,1,0,0,0],ht:[0,0,0,0,0,1,0,0],lt:[0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],ht:[0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c','c','c','c'],sn:[0,0,'s',0],bd:[1,0,0,0],ht:[0,0,0,1],lt:[0,0,0,0],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c','c','c','c','c','c','c','c'],sn:[0,0,'s',0,0,0,'s',0],bd:[1,0,0,0,1,0,0,0],ht:[0,0,0,0,0,1,0,0],lt:[0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c'],sn:[0,0,0,0,'s',0,0,0,0,0,0,0,'s',0,0,0],bd:[1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],ht:[0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0],sn:[0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0],bd:[1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ht:[0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:100,
-    4:  { hh:[1,0,1,0],sn:[0,1,0,1],bd:[1,0,1,0],ht:[0,1,0,0],lt:[0,0,0,1],cy:[1,0,0,0] },
-    8:  { hh:[1,0,1,1,1,0,1,0],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,1,0,0,1,0],ht:[0,1,0,0,0,1,0,0],lt:[0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c',0,'c',0],sn:[0,'s',0,'s'],bd:[1,0,1,0],ht:[0,1,0,0],lt:[0,0,0,1],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c',0,'c','c','c',0,'c',0],sn:[0,0,'s',0,0,0,'s',0],bd:[1,0,0,1,0,0,1,0],ht:[0,1,0,0,0,1,0,0],lt:[0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c',0,'c',0,'c','c','c',0,'c',0,'c','c','c',0,'c',0],sn:[0,0,0,0,'s',0,0,'s',0,0,0,0,'s',0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c',0,'c',0,'c',0,'c','c','c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c','c','c',0,'c',0,'c',0,'c',0,'c',0],sn:[0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0],bd:[1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:140,
-    4:  { hh:[1,0,1,0],sn:[0,0,1,0],bd:[1,0,0,1],ht:[0,1,0,0],lt:[0,0,0,0],cy:[1,0,0,0] },
-    8:  { hh:[1,1,0,1,1,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,0,1,0,0],ht:[0,1,0,0,0,0,1,0],lt:[0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1],sn:[0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c',0,'c',0],sn:[0,0,'s',0],bd:[1,0,0,1],ht:[0,1,0,0],lt:[0,0,0,0],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c','c',0,'c','c','c',0,'c'],sn:[0,0,'s',0,0,0,'s',0],bd:[1,0,0,0,0,1,0,0],ht:[0,1,0,0,0,0,1,0],lt:[0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c','c',0,'c','c','c',0,'c','c','c',0,'c','c','c',0,'c'],sn:[0,0,0,0,'s',0,0,'s',0,0,0,0,'s',0,0,0],bd:[1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c','c',0,'c','c','c',0,'c','c','c',0,'c','c','c',0,'c','c','c',0,'c','c','c',0,'c','c','c',0,'c','c','c',0,'c'],sn:[0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0],bd:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:90,
-    4:  { hh:[1,1,1,1],sn:[0,1,0,0],bd:[1,0,0,1],ht:[0,0,1,0],lt:[0,0,0,1],cy:[1,0,0,0] },
-    8:  { hh:[1,0,1,0,1,0,1,0],sn:[0,0,1,0,0,1,0,0],bd:[1,0,0,1,0,0,1,0],ht:[0,1,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c','c','c','c'],sn:[0,'s',0,0],bd:[1,0,0,1],ht:[0,0,1,0],lt:[0,0,0,1],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c',0,'c',0,'c',0,'c',0],sn:[0,0,'s',0,0,'s',0,0],bd:[1,0,0,1,0,0,1,0],ht:[0,1,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0],sn:[0,0,0,0,'s',0,0,0,0,'s',0,0,0,0,0,0],bd:[1,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c'],sn:[0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,0,0,0,0],bd:[1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],ht:[0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:128,
-    4:  { hh:[1,1,1,1],sn:[0,0,1,0],bd:[1,0,1,0],ht:[0,0,0,0],lt:[0,0,0,0],cy:[1,0,0,0] },
-    8:  { hh:[1,0,1,0,1,0,1,0],sn:[0,0,0,0,1,0,0,0],bd:[1,0,1,0,1,0,1,0],ht:[0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],sn:[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],bd:[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],ht:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c','c','c','c'],sn:[0,0,'s',0],bd:[1,0,1,0],ht:[0,0,0,0],lt:[0,0,0,0],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c',0,'c',0,'c',0,'c',0],sn:[0,0,0,0,'s',0,0,0],bd:[1,0,1,0,1,0,1,0],ht:[0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0],sn:[0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0],bd:[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],ht:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0],sn:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],bd:[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],ht:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:110,
-    4:  { hh:[0,1,0,1],sn:[0,0,1,0],bd:[1,0,0,0],ht:[1,0,0,0],lt:[0,0,0,1],cy:[0,0,1,0] },
-    8:  { hh:[0,1,0,1,0,1,0,1],sn:[0,0,1,0,0,0,1,0],bd:[1,0,0,0,1,0,0,1],ht:[1,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1],cy:[0,0,1,0,0,0,0,0] },
-    16: { hh:[0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],sn:[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],ht:[1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],cy:[0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:[0,'c',0,'c'],sn:[0,0,'s',0],bd:[1,0,0,0],ht:[1,0,0,0],lt:[0,0,0,1],cy:[0,0,1,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:[0,'c',0,'c',0,'c',0,'c'],sn:[0,0,'s',0,0,0,'s',0],bd:[1,0,0,0,1,0,0,1],ht:[1,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1],cy:[0,0,1,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:[0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c'],sn:[0,0,0,0,'s',0,0,0,0,0,0,0,'s',0,0,'s'],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],ht:[1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],cy:[0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:[0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c',0,'c'],sn:[0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'s',0,0,0,0,0,'s',0],bd:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ht:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],cy:[0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:95,
-    4:  { hh:[1,0,0,1],sn:[0,1,0,0],bd:[1,0,1,1],ht:[0,0,1,0],lt:[0,1,0,0],cy:[1,0,0,0] },
-    8:  { hh:[1,0,0,1,1,0,0,1],sn:[0,0,1,0,0,1,0,0],bd:[1,0,1,0,0,0,1,0],ht:[0,1,0,0,0,0,0,1],lt:[0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1],sn:[0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0],bd:[1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0],ht:[0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0],lt:[0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c',0,0,'c'],sn:[0,'s',0,0],bd:[1,0,1,1],ht:[0,0,1,0],lt:[0,1,0,0],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c',0,0,'c','c',0,0,'c'],sn:[0,0,'s',0,0,'s',0,0],bd:[1,0,1,0,0,0,1,0],ht:[0,1,0,0,0,0,0,1],lt:[0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c',0,0,'c','c',0,0,'c','c',0,0,'c','c',0,0,'c'],sn:[0,0,0,0,'s',0,'s',0,0,0,0,0,'s',0,0,0],bd:[1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0],ht:[0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0],lt:[0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c',0,0,'c','c',0,0,'c','c',0,0,'c','c',0,0,'c','c',0,0,'c','c',0,0,'c','c',0,0,'c','c',0,0,'c'],sn:[0,0,0,0,0,0,0,0,'s',0,'s',0,0,0,0,0,0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0],bd:[1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],ht:[0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0],lt:[0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:75,
-    4:  { hh:[1,1,1,1],sn:[0,0,1,1],bd:[1,0,0,0],ht:[0,1,0,0],lt:[0,0,0,1],cy:[1,0,0,0] },
-    8:  { hh:[1,1,1,1,1,1,1,1],sn:[0,0,1,0,0,1,1,0],bd:[1,0,0,0,1,0,0,0],ht:[0,1,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0],bd:[1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],ht:[0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c','c','c','c'],sn:[0,0,'s','s'],bd:[1,0,0,0],ht:[0,1,0,0],lt:[0,0,0,1],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c','c','c','c','c','c','c','c'],sn:[0,0,'s',0,0,'s','s',0],bd:[1,0,0,0,1,0,0,0],ht:[0,1,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c'],sn:[0,0,0,0,'s',0,0,0,0,0,'s',0,'s',0,0,0],bd:[1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],ht:[0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c'],sn:[0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0,0,0,0,0,'s',0,0,0,'s',0,0,0,0,0,0,0],bd:[1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],ht:[0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:160,
-    4:  { hh:[1,1,1,1],sn:[0,1,0,1],bd:[1,0,0,0],ht:[0,0,1,0],lt:[0,0,0,0],cy:[1,0,0,0] },
-    8:  { hh:[1,1,1,1,1,1,1,1],sn:[0,0,1,0,1,0,1,0],bd:[1,0,0,0,0,0,1,0],ht:[0,1,0,0,0,1,0,0],lt:[0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0] },
-    16: { hh:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],sn:[0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],ht:[0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
+    4:  { hh:['c','c','c','c'],sn:[0,'s',0,'s'],bd:[1,0,0,0],ht:[0,0,1,0],lt:[0,0,0,0],cy:[1,0,0,0],rd:[0,0,0,0],ft:[0,0,0,0] },
+    8:  { hh:['c','c','c','c','c','c','c','c'],sn:[0,0,'s',0,'s',0,'s',0],bd:[1,0,0,0,0,0,1,0],ht:[0,1,0,0,0,1,0,0],lt:[0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0] },
+    16: { hh:['c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c'],sn:[0,0,0,0,'s',0,'s',0,0,0,0,0,'s',0,0,0],bd:[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],ht:[0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+    32: { hh:['c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c','c'],sn:[0,0,0,0,0,0,0,0,'s',0,'s',0,0,0,0,0,0,0,0,0,0,0,0,0,'s',0,0,0,0,0,0,0],bd:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ht:[0,1,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],lt:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cy:[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],rd:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],ft:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] } },
   { bpm:120,
-    4:  { hh:Array(4).fill(0),sn:Array(4).fill(0),bd:Array(4).fill(0),ht:Array(4).fill(0),lt:Array(4).fill(0),cy:Array(4).fill(0) },
-    8:  { hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0),ht:Array(8).fill(0),lt:Array(8).fill(0),cy:Array(8).fill(0) },
-    16: { hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0),ht:Array(16).fill(0),lt:Array(16).fill(0),cy:Array(16).fill(0) } },
+    4:  { hh:Array(4).fill(0),sn:Array(4).fill(0),bd:Array(4).fill(0),ht:Array(4).fill(0),lt:Array(4).fill(0),cy:Array(4).fill(0),rd:Array(4).fill(0),ft:Array(4).fill(0) },
+    8:  { hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0),ht:Array(8).fill(0),lt:Array(8).fill(0),cy:Array(8).fill(0),rd:Array(8).fill(0),ft:Array(8).fill(0) },
+    16: { hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0),ht:Array(16).fill(0),lt:Array(16).fill(0),cy:Array(16).fill(0),rd:Array(16).fill(0),ft:Array(16).fill(0) },
+    32: { hh:Array(32).fill(0),sn:Array(32).fill(0),bd:Array(32).fill(0),ht:Array(32).fill(0),lt:Array(32).fill(0),cy:Array(32).fill(0),rd:Array(32).fill(0),ft:Array(32).fill(0) } },
 ];
 
 function loadFromStorage() {
@@ -316,9 +425,10 @@ function buildPresetRow() {
 function savePreset(idx) {
   savedPresets[idx] = {
     bpm,
-    4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd],  ht:[...allSteps[4].ht],  lt:[...allSteps[4].lt],  cy:[...allSteps[4].cy]  },
-    8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd],  ht:[...allSteps[8].ht],  lt:[...allSteps[8].lt],  cy:[...allSteps[8].cy]  },
-    16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd], ht:[...allSteps[16].ht], lt:[...allSteps[16].lt], cy:[...allSteps[16].cy] },
+    4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd],  ht:[...allSteps[4].ht],  lt:[...allSteps[4].lt],  cy:[...allSteps[4].cy],  rd:[...allSteps[4].rd],  ft:[...allSteps[4].ft]  },
+    8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd],  ht:[...allSteps[8].ht],  lt:[...allSteps[8].lt],  cy:[...allSteps[8].cy],  rd:[...allSteps[8].rd],  ft:[...allSteps[8].ft]  },
+    16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd], ht:[...allSteps[16].ht], lt:[...allSteps[16].lt], cy:[...allSteps[16].cy], rd:[...allSteps[16].rd], ft:[...allSteps[16].ft] },
+    32: { hh:[...allSteps[32].hh], sn:[...allSteps[32].sn], bd:[...allSteps[32].bd], ht:[...allSteps[32].ht], lt:[...allSteps[32].lt], cy:[...allSteps[32].cy], rd:[...allSteps[32].rd], ft:[...allSteps[32].ft] },
   };
   saveToStorage();
   showToast('SAVED TO ' + String(idx + 1).padStart(2, '0'));
@@ -336,9 +446,17 @@ function loadPreset(idx) {
   bpm = p.bpm;
   document.getElementById('bpm-val').textContent = bpm;
   document.getElementById('bpm-slider').value = bpm;
-  [4, 8, 16].forEach(mode => {
-    ['hh','sn','bd','ht','lt','cy'].forEach(d => {
+  [4, 8, 16, 32].forEach(mode => {
+    ['bd','ht','lt','cy','rd','ft'].forEach(d => {
       allSteps[mode][d] = (p[mode][d] || Array(mode).fill(0)).map(v => !!v);
+    });
+    allSteps[mode].hh = (p[mode].hh || Array(mode).fill(0)).map(v => {
+      if (v === 'c' || v === 'o') return v;
+      return v ? 'c' : 0;
+    });
+    allSteps[mode].sn = (p[mode].sn || Array(mode).fill(0)).map(v => {
+      if (v === 's' || v === 'r') return v;
+      return v ? 's' : 0;
     });
   });
   if (isPlaying) { clearInterval(timerID); currentStep = 0; startTimer(); }
@@ -374,7 +492,17 @@ function buildGrid() {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.id = `cell-${drum.id}-${stepIdx}`;
-        if (steps[drum.id][stepIdx]) cell.classList.add(`on-${drum.id}`);
+        if (drum.id === 'hh') {
+          const v = steps.hh[stepIdx];
+          if (v === 'c') cell.classList.add('on-hh');
+          else if (v === 'o') cell.classList.add('on-hh-open');
+        } else if (drum.id === 'sn') {
+          const v = steps.sn[stepIdx];
+          if (v === 's') cell.classList.add('on-sn');
+          else if (v === 'r') cell.classList.add('on-sn-rim');
+        } else {
+          if (steps[drum.id][stepIdx]) cell.classList.add(`on-${drum.id}`);
+        }
         cell.onclick = () => toggleCell(drum.id, stepIdx);
         grp.appendChild(cell);
       }
@@ -387,10 +515,40 @@ function buildGrid() {
 
 function toggleCell(drumId, stepIdx) {
   const steps = currentSteps();
-  steps[drumId][stepIdx] = !steps[drumId][stepIdx];
   const cell = document.getElementById(`cell-${drumId}-${stepIdx}`);
-  if (steps[drumId][stepIdx]) cell.classList.add(`on-${drumId}`);
-  else cell.classList.remove(`on-${drumId}`);
+  if (drumId === 'hh') {
+    const cur = steps.hh[stepIdx];
+    if (!cur) {
+      steps.hh[stepIdx] = 'c';
+      cell.classList.remove('on-hh-open');
+      cell.classList.add('on-hh');
+    } else if (cur === 'c') {
+      steps.hh[stepIdx] = 'o';
+      cell.classList.remove('on-hh');
+      cell.classList.add('on-hh-open');
+    } else {
+      steps.hh[stepIdx] = 0;
+      cell.classList.remove('on-hh', 'on-hh-open');
+    }
+  } else if (drumId === 'sn') {
+    const cur = steps.sn[stepIdx];
+    if (!cur) {
+      steps.sn[stepIdx] = 's';
+      cell.classList.remove('on-sn-rim');
+      cell.classList.add('on-sn');
+    } else if (cur === 's') {
+      steps.sn[stepIdx] = 'r';
+      cell.classList.remove('on-sn');
+      cell.classList.add('on-sn-rim');
+    } else {
+      steps.sn[stepIdx] = 0;
+      cell.classList.remove('on-sn', 'on-sn-rim');
+    }
+  } else {
+    steps[drumId][stepIdx] = !steps[drumId][stepIdx];
+    if (steps[drumId][stepIdx]) cell.classList.add(`on-${drumId}`);
+    else cell.classList.remove(`on-${drumId}`);
+  }
 }
 
 function updateVol() {
@@ -400,6 +558,8 @@ function updateVol() {
   vols.ht = parseFloat(document.getElementById('vol-ht').value);
   vols.lt = parseFloat(document.getElementById('vol-lt').value);
   vols.cy = parseFloat(document.getElementById('vol-cy').value);
+  vols.rd = parseFloat(document.getElementById('vol-rd').value);
+  vols.ft = parseFloat(document.getElementById('vol-ft').value);
 }
 
 function setBeat(n, btn) {
@@ -419,7 +579,8 @@ function getStepInterval() {
   const bps = bpm / 60;
   if (beatMode === 4) return 1000 / bps;
   if (beatMode === 8) return 500 / bps;
-  return 250 / bps;
+  if (beatMode === 16) return 250 / bps;
+  return 125 / bps;
 }
 
 function initAudio() {
@@ -461,16 +622,55 @@ function playSnare(t) {
   osc.connect(og); og.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.1);
 }
 
-function playHihat(t) {
+function playRimshot(t) {
+  // Rimshot: sharp click with high-pitched woody tone
+  const osc1 = audioCtx.createOscillator();
+  osc1.frequency.setValueAtTime(1200, t);
+  osc1.frequency.exponentialRampToValueAtTime(600, t + 0.04);
+  const g1 = audioCtx.createGain();
+  g1.gain.setValueAtTime(vols.sn * 1.0, t);
+  g1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+  osc1.connect(g1); g1.connect(audioCtx.destination);
+  osc1.start(t); osc1.stop(t + 0.05);
+
+  const osc2 = audioCtx.createOscillator();
+  osc2.frequency.setValueAtTime(400, t);
+  const g2 = audioCtx.createGain();
+  g2.gain.setValueAtTime(vols.sn * 0.6, t);
+  g2.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+  osc2.connect(g2); g2.connect(audioCtx.destination);
+  osc2.start(t); osc2.stop(t + 0.03);
+
   const noise = audioCtx.createBufferSource();
-  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.08,audioCtx.sampleRate);
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.03, audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  noise.buffer = buf;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 3000; filter.Q.value = 0.8;
+  const gn = audioCtx.createGain();
+  gn.gain.setValueAtTime(vols.sn * 0.4, t);
+  gn.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+  noise.connect(filter); filter.connect(gn); gn.connect(audioCtx.destination); noise.start(t);
+}
+
+function playHihat(t, open = false) {
+  const noise = audioCtx.createBufferSource();
+  const duration = open ? 0.5 : 0.08;
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * duration, audioCtx.sampleRate);
   const d = buf.getChannelData(0);
   for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
   noise.buffer=buf;
   const filter = audioCtx.createBiquadFilter();
-  filter.type='highpass'; filter.frequency.value=7000;
+  filter.type='highpass'; filter.frequency.value = open ? 5000 : 7000;
   const g = audioCtx.createGain();
-  g.gain.setValueAtTime(vols.hh*0.6,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+  if (open) {
+    g.gain.setValueAtTime(vols.hh*0.7, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+  } else {
+    g.gain.setValueAtTime(vols.hh*0.6, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+  }
   noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination); noise.start(t);
 }
 
@@ -523,6 +723,47 @@ function playCrash(t) {
   noise.connect(bp); bp.connect(hp); hp.connect(g); g.connect(audioCtx.destination); noise.start(t);
 }
 
+function playFloorTom(t) {
+  // Floor tom: deeper pitch than low tom, longer decay
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(vols.ft*1.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
+  g.connect(audioCtx.destination);
+  const osc = audioCtx.createOscillator();
+  osc.frequency.setValueAtTime(110,t); osc.frequency.exponentialRampToValueAtTime(55,t+0.28);
+  osc.connect(g); osc.start(t); osc.stop(t+0.55);
+  const noise = audioCtx.createBufferSource();
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.06,audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.3;
+  noise.buffer=buf;
+  const ng = audioCtx.createGain();
+  ng.gain.setValueAtTime(vols.ft*0.4,t); ng.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+  noise.connect(ng); ng.connect(audioCtx.destination); noise.start(t);
+}
+
+function playRide(t) {
+  // Ride cymbal: clear metallic ping with long sustain
+  const noise = audioCtx.createBufferSource();
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*1.2,audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  noise.buffer=buf;
+  const bp = audioCtx.createBiquadFilter();
+  bp.type='bandpass'; bp.frequency.value=3500; bp.Q.value=2.0;
+  const hp = audioCtx.createBiquadFilter();
+  hp.type='highpass'; hp.frequency.value=2000;
+  const gn = audioCtx.createGain();
+  gn.gain.setValueAtTime(vols.rd*0.5,t); gn.gain.exponentialRampToValueAtTime(0.001,t+1.2);
+  noise.connect(bp); bp.connect(hp); hp.connect(gn); gn.connect(audioCtx.destination); noise.start(t);
+  // Ping component
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(3200,t);
+  const go = audioCtx.createGain();
+  go.gain.setValueAtTime(vols.rd*0.4,t); go.gain.exponentialRampToValueAtTime(0.001,t+0.6);
+  osc.connect(go); go.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.6);
+}
+
 // Lookahead scheduler - schedules audio ahead of time for accurate timing
 const LOOKAHEAD = 0.1;    // seconds to schedule ahead
 const SCHEDULE_INTERVAL = 25; // ms between scheduler runs
@@ -532,11 +773,15 @@ let nextStepTime = 0;
 function scheduleStep(stepIdx, time) {
   const steps = currentSteps();
   if(steps.bd[stepIdx]) playKick(time);
-  if(steps.sn[stepIdx]) playSnare(time);
-  if(steps.hh[stepIdx]) playHihat(time);
+  if(steps.sn[stepIdx] === 's') playSnare(time);
+  if(steps.sn[stepIdx] === 'r') playRimshot(time);
+  if(steps.hh[stepIdx] === 'c') playHihat(time, false);
+  if(steps.hh[stepIdx] === 'o') playHihat(time, true);
   if(steps.ht[stepIdx]) playHiTom(time);
   if(steps.lt[stepIdx]) playLoTom(time);
+  if(steps.ft[stepIdx]) playFloorTom(time);
   if(steps.cy[stepIdx]) playCrash(time);
+  if(steps.rd[stepIdx]) playRide(time);
 
   // Schedule UI update to fire when audio actually plays
   const delay = (time - audioCtx.currentTime) * 1000;
@@ -619,6 +864,57 @@ function setupBpmBtn(btnId, delta) {
 }
 setupBpmBtn('bpm-dec', -1);
 setupBpmBtn('bpm-inc', +1);
+
+// Custom vertical sliders
+function initVolSliders() {
+  document.querySelectorAll('.vol-slider-wrap').forEach(wrap => {
+    const key = wrap.dataset.vol;
+    const hiddenInput = document.getElementById('vol-' + key);
+    const thumb = wrap.querySelector('.vol-thumb');
+    const fill = wrap.querySelector('.vol-fill');
+
+    function setVal(v) {
+      v = Math.max(0, Math.min(1, v));
+      hiddenInput.value = v;
+      const pct = v * 100;
+      thumb.style.bottom = pct + '%';
+      fill.style.height = pct + '%';
+      updateVol();
+    }
+
+    // Init position
+    setVal(parseFloat(hiddenInput.value));
+
+    function getValFromEvent(e) {
+      const rect = wrap.getBoundingClientRect();
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const ratio = 1 - (clientY - rect.top) / rect.height;
+      return ratio;
+    }
+
+    let dragging = false;
+    wrap.addEventListener('mousedown', e => {
+      dragging = true;
+      setVal(getValFromEvent(e));
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if (dragging) setVal(getValFromEvent(e));
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+
+    wrap.addEventListener('touchstart', e => {
+      dragging = true;
+      setVal(getValFromEvent(e));
+      e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchmove', e => {
+      if (dragging) { setVal(getValFromEvent(e)); e.preventDefault(); }
+    }, { passive: false });
+    document.addEventListener('touchend', () => { dragging = false; });
+  });
+}
+initVolSliders();
 </script>
 </body>
 </html>
