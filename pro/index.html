@@ -248,6 +248,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
 
 <script>
 const LS_KEY = 'drummachine_presets_v5';
+const LS_SESSION = 'drummachine_session_v1';
 let audioCtx, isPlaying = false, currentStep = 0, timerID = null;
 let beatMode = 4, bpm = 120;
 let vols = { hh: 0.7, bd: 0.9, sn: 0.8, ht: 0.7, lt: 0.7, cy: 0.6, rd: 0.6, ft: 0.7 };
@@ -461,6 +462,7 @@ function loadPreset(idx) {
   });
   if (isPlaying) { clearInterval(timerID); currentStep = 0; startTimer(); }
   buildGrid();
+  saveSession();
 }
 
 function currentSteps() { return allSteps[beatMode]; }
@@ -560,12 +562,39 @@ function updateVol() {
   vols.cy = parseFloat(document.getElementById('vol-cy').value);
   vols.rd = parseFloat(document.getElementById('vol-rd').value);
   vols.ft = parseFloat(document.getElementById('vol-ft').value);
+  saveSession();
+}
+
+function saveSession() {
+  try {
+    localStorage.setItem(LS_SESSION, JSON.stringify({
+      activePreset, beatMode, bpm, vols
+    }));
+  } catch(e) {}
+}
+
+function restoreSession() {
+  try {
+    const s = localStorage.getItem(LS_SESSION);
+    if (!s) return false;
+    const d = JSON.parse(s);
+    if (d.vols) vols = d.vols;
+    if (d.beatMode) {
+      beatMode = d.beatMode;
+      document.querySelectorAll('.beat-btn').forEach(b => {
+        b.classList.toggle('selected', parseInt(b.textContent) === beatMode);
+      });
+    }
+    if (d.bpm) bpm = d.bpm;
+    return d.activePreset != null ? d.activePreset : 0;
+  } catch(e) { return false; }
 }
 
 function setBeat(n, btn) {
   document.querySelectorAll('.beat-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   beatMode = n; currentStep = 0; buildGrid();
+  saveSession();
 }
 
 function setBPM(v) {
@@ -573,6 +602,7 @@ function setBPM(v) {
   document.getElementById('bpm-val').textContent = bpm;
   document.getElementById('bpm-slider').value = bpm;
   if (isPlaying) { clearTimeout(timerID); startTimer(); }
+  saveSession();
 }
 
 function getStepInterval() {
@@ -835,7 +865,8 @@ function togglePlay() {
 }
 
 buildPresetRow();
-loadPreset(0);
+const restoredPreset = restoreSession();
+loadPreset(restoredPreset !== false ? restoredPreset : 0);
 
 // BPM long-press repeat
 function setupBpmBtn(btnId, delta) {
@@ -872,6 +903,9 @@ function initVolSliders() {
     const hiddenInput = document.getElementById('vol-' + key);
     const thumb = wrap.querySelector('.vol-thumb');
     const fill = wrap.querySelector('.vol-fill');
+
+    // Use restored vols value if available
+    if (vols[key] != null) hiddenInput.value = vols[key];
 
     function setVal(v) {
       v = Math.max(0, Math.min(1, v));
