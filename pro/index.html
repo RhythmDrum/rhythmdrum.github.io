@@ -7,8 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#1a1a1a">
-  <link rel="apple-touch-icon" href="any-favicon.png" sizes="180x180">
-  <link rel="icon" type="image/png" href="any-favicon.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="./any-favicon.png" sizes="180x180">
+  <link rel="icon" type="image/png" href="./any-favicon.png" sizes="192x192">
   <title>DRUM MACHINE</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -817,13 +817,17 @@ function scheduleStep(stepIdx, time) {
   const delay = (time - audioCtx.currentTime) * 1000;
   const thisStep = stepIdx;
   const stepDuration = getStepInterval();
+  const ledInterval = (beatMode === 16 || beatMode === 32) ? 4 : 1;
+  const flashLed = (thisStep % ledInterval === 0);
   setTimeout(() => {
     const led = document.getElementById('beat-led');
     DRUMS.forEach(drum => { const cell = document.getElementById(`cell-${drum.id}-${thisStep}`); if(cell) cell.classList.add('current'); });
-    led.classList.add('active');
+    if (flashLed) {
+      led.classList.add('active');
+      setTimeout(() => { led.classList.remove('active'); }, Math.min(stepDuration * ledInterval * 0.6, 200));
+    }
     setTimeout(() => {
       DRUMS.forEach(drum => { const cell = document.getElementById(`cell-${drum.id}-${thisStep}`); if(cell) cell.classList.remove('current'); });
-      led.classList.remove('active');
     }, Math.min(stepDuration * 0.8, 120));
   }, Math.max(0, delay));
 }
