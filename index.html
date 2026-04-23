@@ -427,10 +427,14 @@ function scheduleStep(stepIdx, time) {
   setTimeout(() => {
     const led = document.getElementById('beat-led');
     DRUMS.forEach(drum => { const cell = document.getElementById(`cell-${drum.id}-${thisStep}`); if(cell) cell.classList.add('current'); });
-    led.classList.add('active');
+    const shouldFlashLed = beatMode !== 16 || thisStep % 4 === 0;
+    if (shouldFlashLed) {
+      led.classList.add('active');
+      const ledDuration = beatMode === 16 ? Math.min(stepDuration * 4 * 0.8, 300) : Math.min(stepDuration * 0.8, 120);
+      setTimeout(() => { led.classList.remove('active'); }, ledDuration);
+    }
     setTimeout(() => {
       DRUMS.forEach(drum => { const cell = document.getElementById(`cell-${drum.id}-${thisStep}`); if(cell) cell.classList.remove('current'); });
-      led.classList.remove('active');
     }, Math.min(stepDuration * 0.8, 120));
   }, Math.max(0, delay));
 }
