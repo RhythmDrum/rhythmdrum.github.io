@@ -6,24 +6,24 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#000000">
   <link rel="apple-touch-icon" href="./any-favicon.png" sizes="180x180">
   <link rel="icon" type="image/png" href="./any-favicon.png" sizes="192x192">
   <title>DRUM MACHINE</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bd: #E24B4A; --sn: #378ADD; --hh: #1D9E75;
-  --ht: #A855F7; --lt: #EC4899; --cy: #F59E0B;
-  --rd: #06B6D4; --ft: #F97316;
-  --bg-main: #1a1a1a; --bg-cell: #2e2e2e;
+  --cy: #F53636; --rd: #F97316; --hh: #EAB308;
+  --ht: #84CC16; --lt: #22C55E; --sn: #3B82F6;
+  --ft: #6366F1; --bd: #A855F7;
+  --bg-main: #000000; --bg-cell: #2e2e2e;
   --text-primary: #f0ece0; --text-muted: #888; --accent: #EF9F27;
 }
 body { background: transparent; background-color:#000;}
-.dm-wrap { background: var(--bg-main); padding: 20px; color: var(--text-primary); user-select: none; border: 1px solid #333; }
+.dm-wrap { background: var(--bg-main); padding: 20px; color: var(--text-primary); user-select: none; }
 .dm-led { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: background 0.05s, box-shadow 0.05s; display: inline-block; }
 .dm-led.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-.controls-col { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.controls-col { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
 .bpm-box { border: 1px solid #444; border-radius: 10px; padding: 12px 16px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .bpm-val { font-size: 32px; color: var(--text-primary); letter-spacing: 1px; line-height: 1; margin-bottom: 0; }
 .bpm-slider-row { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0; }
@@ -42,53 +42,53 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .grid-section { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .drum-row { display: flex; align-items: center; gap: 8px; }
 .drum-label { width: 36px; display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
-.drum-label-abbr { font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+.drum-label-abbr { font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
 .drum-dot { width: 8px; height: 8px; border-radius: 50%; }
 .cells-wrap { display: flex; gap: 4px; flex: 1; }
 .beat-group { display: flex; gap: 3px; flex: 1; }
 .cell { flex: 1; height: 27px; border-radius: 5px; background: var(--bg-cell); border: 1px solid #3a3a3a; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
 .cell:hover { border-color: #666; background: #363636; }
-.cell.on-bd { background: var(--bd); border-color: #c43d3d; }
-.cell.on-sn { background: var(--sn); border-color: #2a6ab0; }
-.cell.on-sn-rim { background: #60a5fa; border-color: var(--sn); outline: 2px solid var(--sn); outline-offset: -4px; }
-.cell.on-hh { background: #1D9E75; border-color: #147a5c; }
-.cell.on-hh-open { background: #2ecc71; border-color: #1D9E75; outline: 2px solid #1D9E75; outline-offset: -4px; }
-.cell.on-ht { background: var(--ht); border-color: #7c3aed; }
-.cell.on-lt { background: var(--lt); border-color: #be185d; }
-.cell.on-cy { background: var(--cy); border-color: #d97706; }
-.cell.on-rd { background: var(--rd); border-color: #0891b2; }
-.cell.on-ft { background: var(--ft); border-color: #ea580c; }
-body.playing .cell.on-bd { background: #8a2d2c; border-color: #7a2828; }
-body.playing .cell.on-sn { background: #1e4f7a; border-color: #1a4268; }
-body.playing .cell.on-sn-rim { background: #1e4f7a; border-color: var(--sn); outline: 2px solid var(--sn); outline-offset: -4px; }
-body.playing .cell.on-hh { background: #0f5c42; border-color: #0d4e38; }
-body.playing .cell.on-hh-open { background: #1a7a4a; border-color: #1D9E75; outline: 2px solid #1D9E75; outline-offset: -4px; }
-body.playing .cell.on-ht { background: #5b21b6; border-color: #4c1d95; }
-body.playing .cell.on-lt { background: #9d174d; border-color: #831843; }
-body.playing .cell.on-cy { background: #92400e; border-color: #78350f; }
-body.playing .cell.on-rd { background: #0e5f75; border-color: #0891b2; }
-body.playing .cell.on-ft { background: #9a3412; border-color: #ea580c; }
-body.playing .cell.on-bd.current { background: #ff6b6a; border-color: #c43d3d; box-shadow: none; }
-body.playing .cell.on-sn.current { background: #5ba3e8; border-color: #2a6ab0; box-shadow: none; }
-body.playing .cell.on-sn-rim.current { background: #93c5fd; border-color: var(--sn); box-shadow: none; }
-body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; box-shadow: none; }
-body.playing .cell.on-hh-open.current { background: #5fffb0; border-color: #1D9E75; box-shadow: none; }
-body.playing .cell.on-ht.current { background: #c084fc; border-color: #7c3aed; box-shadow: none; }
-body.playing .cell.on-lt.current { background: #f472b6; border-color: #be185d; box-shadow: none; }
-body.playing .cell.on-cy.current { background: #fcd34d; border-color: #d97706; box-shadow: none; }
-body.playing .cell.on-rd.current { background: #67e8f9; border-color: #0891b2; box-shadow: none; }
-body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; box-shadow: none; }
+.cell.on-cy  { background: var(--cy); border-color: transparent; }
+.cell.on-rd  { background: var(--rd); border-color: transparent; }
+.cell.on-hh  { background: var(--hh); border-color: transparent; }
+.cell.on-hh-open { background: var(--hh); border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; }
+.cell.on-ht  { background: var(--ht); border-color: transparent; }
+.cell.on-lt  { background: var(--lt); border-color: transparent; }
+.cell.on-sn  { background: var(--sn); border-color: transparent; }
+.cell.on-sn-rim { background: var(--sn); border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; }
+.cell.on-ft  { background: var(--ft); border-color: transparent; }
+.cell.on-bd  { background: var(--bd); border-color: transparent; }
+body.playing .cell.on-cy  { background: #7f1d1d; border-color: transparent; }
+body.playing .cell.on-rd  { background: #7c2d12; border-color: transparent; }
+body.playing .cell.on-hh  { background: #713f12; border-color: transparent; }
+body.playing .cell.on-hh-open { background: #713f12; border-color: transparent; outline: 2px solid rgba(0,0,0,0.5); outline-offset: -4px; }
+body.playing .cell.on-ht  { background: #365314; border-color: transparent; }
+body.playing .cell.on-lt  { background: #14532d; border-color: transparent; }
+body.playing .cell.on-sn  { background: #1e3a8a; border-color: transparent; }
+body.playing .cell.on-sn-rim { background: #1e3a8a; border-color: transparent; outline: 2px solid rgba(0,0,0,0.5); outline-offset: -4px; }
+body.playing .cell.on-ft  { background: #312e81; border-color: transparent; }
+body.playing .cell.on-bd  { background: #581c87; border-color: transparent; }
+body.playing .cell.on-cy.current  { background: #fca5a5; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-rd.current  { background: #fdba74; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-hh.current  { background: #fde047; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-hh-open.current { background: #fde047; border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; box-shadow: none; }
+body.playing .cell.on-ht.current  { background: #bef264; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-lt.current  { background: #86efac; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-sn.current  { background: #93c5fd; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-sn-rim.current { background: #93c5fd; border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; box-shadow: none; }
+body.playing .cell.on-ft.current  { background: #a5b4fc; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-bd.current  { background: #d8b4fe; border-color: transparent; box-shadow: none; }
 .cell.current:not(.on-bd):not(.on-sn):not(.on-sn-rim):not(.on-hh):not(.on-hh-open):not(.on-ht):not(.on-lt):not(.on-cy):not(.on-rd):not(.on-ft)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 5px; }
 .group-div { width: 1px; background: #444; align-self: stretch; flex-shrink: 0; }
 .vol-row { display: flex; padding: 12px 8px 10px; border: 1px solid #444; border-radius: 10px; margin-bottom: 14px; justify-content: space-around; align-items: flex-end; width: 100%; box-sizing: border-box; }
 .vol-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
-.vol-item label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.vol-item label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; line-height: 1; color: var(--text-muted); }
 .vol-dot { display: none; }
 /* Custom vertical slider */
 .vol-slider-wrap {
   position: relative;
   width: 20px;
-  height: 70px;
+  height: 56px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -129,7 +129,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
 .preset-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 16px; }
 .preset-btn-wrap { position: relative; }
 .preset-btn {
-  width: 100%; background: var(--bg-cell); border: 1px solid #444; border-radius: 6px;
+  width: 100%; background: var(--bg-cell); border: 1px solid #444; border-radius: 3px;
   color: var(--text-muted); font-size: 11px;
   letter-spacing: 1px; padding: 6px 4px; cursor: pointer;
   transition: border-color 0.1s, color 0.1s, background 0.1s;
@@ -176,7 +176,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--cy);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.6" id="vol-cy">
-      <label style="color:var(--cy);">CY</label>
+      <label>CY</label>
     </div>
     <div class="vol-item">
       <div class="vol-slider-wrap" data-vol="rd" data-color="var(--rd)">
@@ -184,7 +184,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--rd);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.6" id="vol-rd">
-      <label style="color:var(--rd);">RD</label>
+      <label>RD</label>
     </div>
     <div class="vol-item">
       <div class="vol-slider-wrap" data-vol="hh" data-color="var(--hh)">
@@ -192,7 +192,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--hh);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-hh">
-      <label style="color:var(--hh);">HH</label>
+      <label>HH</label>
     </div>
     <div class="vol-item">
       <div class="vol-slider-wrap" data-vol="ht" data-color="var(--ht)">
@@ -200,7 +200,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--ht);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-ht">
-      <label style="color:var(--ht);">HT</label>
+      <label>HT</label>
     </div>
     <div class="vol-item">
       <div class="vol-slider-wrap" data-vol="lt" data-color="var(--lt)">
@@ -208,7 +208,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--lt);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-lt">
-      <label style="color:var(--lt);">LT</label>
+      <label>LT</label>
     </div>
     <div class="vol-item">
       <div class="vol-slider-wrap" data-vol="sn" data-color="var(--sn)">
@@ -216,7 +216,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--sn);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-sn">
-      <label style="color:var(--sn);">SN</label>
+      <label>SN</label>
     </div>
     <div class="vol-item">
       <div class="vol-slider-wrap" data-vol="ft" data-color="var(--ft)">
@@ -224,7 +224,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--ft);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.7" id="vol-ft">
-      <label style="color:var(--ft);">FT</label>
+      <label>FT</label>
     </div>
     <div class="vol-item">
       <div class="vol-slider-wrap" data-vol="bd" data-color="var(--bd)">
@@ -232,7 +232,7 @@ body.playing .cell.on-ft.current { background: #fdba74; border-color: #ea580c; b
         <div class="vol-thumb" style="background:var(--bd);"></div>
       </div>
       <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.9" id="vol-bd">
-      <label style="color:var(--bd);">BD</label>
+      <label>BD</label>
     </div>
   </div>
   <div class="footer">
@@ -878,10 +878,16 @@ function setupBpmBtn(btnId, delta) {
   let holdTimer = null;
   let repeatTimer = null;
 
+  function step() {
+    const next = delta > 0
+      ? Math.floor(bpm / 10) * 10 + 10
+      : Math.ceil(bpm / 10) * 10 - 10;
+    setBPM(next);
+  }
   function start() {
-    setBPM(bpm + delta);
+    step();
     holdTimer = setTimeout(() => {
-      repeatTimer = setInterval(() => setBPM(bpm + delta), 60);
+      repeatTimer = setInterval(step, 120);
     }, 400);
   }
   function stop() {
@@ -897,8 +903,8 @@ function setupBpmBtn(btnId, delta) {
   btn.addEventListener('touchend', stop);
   btn.addEventListener('touchcancel', stop);
 }
-setupBpmBtn('bpm-dec', -1);
-setupBpmBtn('bpm-inc', +1);
+setupBpmBtn('bpm-dec', -10);
+setupBpmBtn('bpm-inc', +10);
 
 // Custom vertical sliders
 function initVolSliders() {
