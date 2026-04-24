@@ -352,8 +352,27 @@ const DEFAULT_PRESETS = [
 ];
 
 function loadFromStorage() {
-  try { const r = localStorage.getItem(LS_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+  const defaults = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+  // 10スロット分の空プリセットをデフォルトで用意
+  const empty = {
+    bpm: 120,
+    4:  { hh:Array(4).fill(0),sn:Array(4).fill(0),bd:Array(4).fill(0),ht:Array(4).fill(0),lt:Array(4).fill(0),cy:Array(4).fill(0),rd:Array(4).fill(0),ft:Array(4).fill(0) },
+    8:  { hh:Array(8).fill(0),sn:Array(8).fill(0),bd:Array(8).fill(0),ht:Array(8).fill(0),lt:Array(8).fill(0),cy:Array(8).fill(0),rd:Array(8).fill(0),ft:Array(8).fill(0) },
+    16: { hh:Array(16).fill(0),sn:Array(16).fill(0),bd:Array(16).fill(0),ht:Array(16).fill(0),lt:Array(16).fill(0),cy:Array(16).fill(0),rd:Array(16).fill(0),ft:Array(16).fill(0) },
+    32: { hh:Array(32).fill(0),sn:Array(32).fill(0),bd:Array(32).fill(0),ht:Array(32).fill(0),lt:Array(32).fill(0),cy:Array(32).fill(0),rd:Array(32).fill(0),ft:Array(32).fill(0) },
+  };
+  const base = Array.from({length: 10}, (_, i) =>
+    JSON.parse(JSON.stringify(defaults[i] || empty))
+  );
+  try {
+    const r = localStorage.getItem(LS_KEY);
+    if (r) {
+      const saved = JSON.parse(r);
+      // 保存済みスロットだけ上書き（nullや未定義は初期値を維持）
+      saved.forEach((p, i) => { if (p != null) base[i] = p; });
+    }
+  } catch(e) {}
+  return base;
 }
 function saveToStorage() {
   try { localStorage.setItem(LS_KEY, JSON.stringify(savedPresets)); } catch(e) {}
@@ -472,9 +491,12 @@ function loadPreset(idx) {
   bpm = p.bpm;
   document.getElementById('bpm-val').textContent = bpm;
   document.getElementById('bpm-slider').value = bpm;
-  if (p.repeatCount != null) {
+  if ('repeatCount' in p) {
     repeatCount = p.repeatCount;
     document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+  } else {
+    repeatCount = 0;
+    document.getElementById('repeat-val').textContent = '∞';
   }
   [4, 8, 16, 32].forEach(mode => {
     ['bd','ht','lt','cy','rd','ft'].forEach(d => {
