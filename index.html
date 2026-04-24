@@ -15,12 +15,12 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bd: #E24B4A; --sn: #378ADD; --hh: #1D9E75;
+  --bd: #378ADD; --sn: #E24B4A; --hh: #1D9E75;
   --bg-main: #000000; --bg-cell: #2e2e2e;
   --text-primary: #f0ece0; --text-muted: #888; --accent: #EF9F27;
 }
 html { background: #000; }
-body { background: #000; }
+body { background: #000; font-family: 'Helvetica Neue', Arial, Meiryo, sans-serif; }
 .rd-wrap { background: #000; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)) 20px; color: var(--text-primary); user-select: none; }
 .rd-led { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: background 0.05s, box-shadow 0.05s; display: inline-block; }
 .rd-led.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
@@ -47,8 +47,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .beat-group { display: flex; gap: 3px; flex: 1; }
 .cell { flex: 1; height: 42px; border-radius: 6px; background: var(--bg-cell); border: 1px solid #3a3a3a; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
 .cell:hover { border-color: #666; background: #363636; }
-.cell.on-bd { background: var(--bd); border-color: #c43d3d; }
-.cell.on-sn { background: var(--sn); border-color: #2a6ab0; }
+.cell.on-bd { background: var(--bd); border-color: #2a6ab0; }
+.cell.on-sn { background: var(--sn); border-color: #c43d3d; }
 .cell.on-hh { background: #1D9E75; border-color: #147a5c; }
 body.playing .cell.on-bd { background: #8a2d2c; border-color: #7a2828; }
 body.playing .cell.on-sn { background: #1e4f7a; border-color: #1a4268; }
@@ -61,7 +61,10 @@ body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; b
 .vol-row { display: flex; gap: 20px; padding: 10px 22px 16px; border: 1px solid #444; border-radius: 8px; margin-bottom: 12px; align-items: flex-start; }
 .vol-item { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 0; }
 .vol-item label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-bottom: 2px; }
-.vol-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.vol-dot { display: none; }
+.vol-slider#vol-hh::-webkit-slider-thumb { background: #1D9E75 !important; }
+.vol-slider#vol-sn::-webkit-slider-thumb { background: #E24B4A !important; }
+.vol-slider#vol-bd::-webkit-slider-thumb { background: #378ADD !important; }
 .vol-slider { width: 100% !important; min-width: 0; max-width: 100%; }
 .preset-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
 .preset-btn-wrap { flex: 1; position: relative; }
@@ -111,16 +114,16 @@ body.playing .cell.on-hh.current { background: #2dcc97; border-color: #147a5c; b
   <div class="grid-section" id="grid-section"></div>
   <div class="vol-row">
     <div class="vol-item">
-      <label style="color:var(--hh);"><span class="vol-dot" style="background:var(--hh);"></span>HH</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-hh" oninput="updateVol()">
+      <label>HH</label>
+      <input type="range" class="vol-slider" style="--thumb-color:var(--hh);" min="0" max="1" step="0.01" value="0.8" id="vol-hh" oninput="updateVol()">
     </div>
     <div class="vol-item">
-      <label style="color:var(--sn);"><span class="vol-dot" style="background:var(--sn);"></span>SN</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-sn" oninput="updateVol()">
+      <label>SN</label>
+      <input type="range" class="vol-slider" style="--thumb-color:var(--sn);" min="0" max="1" step="0.01" value="0.8" id="vol-sn" oninput="updateVol()">
     </div>
     <div class="vol-item">
-      <label style="color:var(--bd);"><span class="vol-dot" style="background:var(--bd);"></span>BD</label>
-      <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" id="vol-bd" oninput="updateVol()">
+      <label>BD</label>
+      <input type="range" class="vol-slider" style="--thumb-color:var(--bd);" min="0" max="1" step="0.01" value="0.8" id="vol-bd" oninput="updateVol()">
     </div>
   </div>
 
@@ -557,9 +560,10 @@ function setupBpmBtn(btnId, delta) {
   let repeatTimer = null;
 
   function start() {
-    setBPM(bpm + delta);
+    const rounded = delta > 0 ? Math.floor(bpm / 10) * 10 + delta : Math.ceil(bpm / 10) * 10 + delta;
+    setBPM(rounded);
     holdTimer = setTimeout(() => {
-      repeatTimer = setInterval(() => setBPM(bpm + delta), 60);
+      repeatTimer = setInterval(() => setBPM(Math.round(bpm / 10) * 10 + delta), 60);
     }, 400);
   }
   function stop() {
@@ -575,8 +579,8 @@ function setupBpmBtn(btnId, delta) {
   btn.addEventListener('touchend', stop);
   btn.addEventListener('touchcancel', stop);
 }
-setupBpmBtn('bpm-dec', -1);
-setupBpmBtn('bpm-inc', +1);
+setupBpmBtn('bpm-dec', -10);
+setupBpmBtn('bpm-inc', +10);
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
