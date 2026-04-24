@@ -450,7 +450,7 @@ function buildPresetRow() {
 
 function savePreset(idx) {
   savedPresets[idx] = {
-    bpm,
+    bpm, repeatCount,
     4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd],  ht:[...allSteps[4].ht],  lt:[...allSteps[4].lt],  cy:[...allSteps[4].cy],  rd:[...allSteps[4].rd],  ft:[...allSteps[4].ft]  },
     8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd],  ht:[...allSteps[8].ht],  lt:[...allSteps[8].lt],  cy:[...allSteps[8].cy],  rd:[...allSteps[8].rd],  ft:[...allSteps[8].ft]  },
     16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd], ht:[...allSteps[16].ht], lt:[...allSteps[16].lt], cy:[...allSteps[16].cy], rd:[...allSteps[16].rd], ft:[...allSteps[16].ft] },
@@ -472,6 +472,10 @@ function loadPreset(idx) {
   bpm = p.bpm;
   document.getElementById('bpm-val').textContent = bpm;
   document.getElementById('bpm-slider').value = bpm;
+  if (p.repeatCount != null) {
+    repeatCount = p.repeatCount;
+    document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+  }
   [4, 8, 16, 32].forEach(mode => {
     ['bd','ht','lt','cy','rd','ft'].forEach(d => {
       allSteps[mode][d] = (p[mode][d] || Array(mode).fill(0)).map(v => !!v);
