@@ -619,7 +619,13 @@ function updateVol() {
 function saveSession() {
   try {
     localStorage.setItem(LS_SESSION, JSON.stringify({
-      activePreset, beatMode, bpm, vols, countInEnabled, repeatCount
+      activePreset, beatMode, bpm, vols, countInEnabled, repeatCount,
+      allSteps: {
+        4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd],  ht:[...allSteps[4].ht],  lt:[...allSteps[4].lt],  cy:[...allSteps[4].cy],  rd:[...allSteps[4].rd],  ft:[...allSteps[4].ft]  },
+        8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd],  ht:[...allSteps[8].ht],  lt:[...allSteps[8].lt],  cy:[...allSteps[8].cy],  rd:[...allSteps[8].rd],  ft:[...allSteps[8].ft]  },
+        16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd], ht:[...allSteps[16].ht], lt:[...allSteps[16].lt], cy:[...allSteps[16].cy], rd:[...allSteps[16].rd], ft:[...allSteps[16].ft] },
+        32: { hh:[...allSteps[32].hh], sn:[...allSteps[32].sn], bd:[...allSteps[32].bd], ht:[...allSteps[32].ht], lt:[...allSteps[32].lt], cy:[...allSteps[32].cy], rd:[...allSteps[32].rd], ft:[...allSteps[32].ft] },
+      }
     }));
   } catch(e) {}
 }
@@ -645,6 +651,22 @@ function restoreSession() {
       });
     }
     if (d.bpm) bpm = d.bpm;
+    if (d.allSteps) {
+      [4, 8, 16, 32].forEach(mode => {
+        if (!d.allSteps[mode]) return;
+        ['bd','ht','lt','cy','rd','ft'].forEach(drum => {
+          allSteps[mode][drum] = (d.allSteps[mode][drum] || Array(mode).fill(0)).map(v => !!v);
+        });
+        allSteps[mode].hh = (d.allSteps[mode].hh || Array(mode).fill(0)).map(v => {
+          if (v === 'c' || v === 'o') return v;
+          return v ? 'c' : 0;
+        });
+        allSteps[mode].sn = (d.allSteps[mode].sn || Array(mode).fill(0)).map(v => {
+          if (v === 's' || v === 'r') return v;
+          return v ? 's' : 0;
+        });
+      });
+    }
     return d.activePreset != null ? d.activePreset : 0;
   } catch(e) { return false; }
 }
@@ -1017,7 +1039,19 @@ buildPresetRow();
 setupRepeatBtn('repeat-dec', -1);
 setupRepeatBtn('repeat-inc', +1);
 const restoredPreset = restoreSession();
-loadPreset(restoredPreset !== false ? restoredPreset : 0);
+if (restoredPreset !== false) {
+  // セッション復元済み: allStepsはrestoreSession内で設定済みなので
+  // プリセットのUI部分（選択状態・BPM表示）だけ更新
+  activePreset = restoredPreset;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  const pb = document.getElementById(`preset-btn-${restoredPreset}`);
+  if (pb) pb.classList.add('active');
+  document.getElementById('bpm-val').textContent = bpm;
+  document.getElementById('bpm-slider').value = bpm;
+  buildGrid();
+} else {
+  loadPreset(0);
+}
 
 // BPM long-press repeat
 function setupBpmBtn(btnId, delta) {
