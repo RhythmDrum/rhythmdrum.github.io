@@ -19,7 +19,7 @@
   --bg-main: #000000; --bg-cell: #2e2e2e;
   --text-primary: #f0ece0; --text-muted: #888; --accent: #EF9F27;
 }
-body { background: transparent; background-color:#000;}
+body { background: transparent; background-color:#000; font-family: 'Helvetica Neue', Arial, Meiryo, sans-serif; }
 .dm-wrap { background: var(--bg-main); padding: 20px; color: var(--text-primary); user-select: none; }
 .dm-led { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: background 0.05s, box-shadow 0.05s; display: inline-block; }
 .dm-led.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
@@ -28,7 +28,16 @@ body { background: transparent; background-color:#000;}
 .bpm-val { font-size: 32px; color: var(--text-primary); letter-spacing: 1px; line-height: 1; margin-bottom: 0; }
 .bpm-slider-row { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0; }
 .ctrl-label { font-size: 10px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; line-height: 1; }
-.beat-btns { display: flex; gap: 6px; justify-content: center; }
+.beat-controls-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.beat-btns { display: flex; gap: 6px; }
+.right-controls { display: flex; align-items: center; gap: 6px; }
+.count-btn { background: var(--bg-cell); border: 1px solid #444; border-radius: 6px; color: var(--text-muted); font-size: 10px; letter-spacing: 1px; padding: 4px 8px; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
+.count-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(239,159,39,0.08); }
+.repeat-control { display: flex; align-items: center; gap: 4px; }
+.repeat-adj { width: 22px; height: 22px; border-radius: 4px; border: 1px solid #444; background: var(--bg-cell); color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; line-height: 1; padding: 0; }
+.repeat-adj:hover { background: #3a3a3a; border-color: #666; }
+.repeat-val { font-size: 12px; color: var(--text-primary); min-width: 24px; text-align: center; }
+.repeat-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
 .beat-btn { background: var(--bg-cell); border: 1px solid #444; border-radius: 50%; color: var(--text-primary); font-size: 11px; font-weight: 500; width: 30px; height: 30px; padding: 0; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .beat-btn:hover { background: #3a3a3a; border-color: #666; }
 .beat-btn.selected { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
@@ -161,11 +170,24 @@ body.playing .cell.on-bd.current  { background: #d8b4fe; border-color: transpare
       </div>
       <span class="ctrl-label">BPM</span>
     </div>
-    <div class="beat-btns">
-      <button class="beat-btn selected" onclick="setBeat(4,this)">4</button>
-      <button class="beat-btn" onclick="setBeat(8,this)">8</button>
-      <button class="beat-btn" onclick="setBeat(16,this)">16</button>
-      <button class="beat-btn" onclick="setBeat(32,this)">32</button>
+    <div class="beat-controls-row">
+      <div class="beat-btns">
+        <button class="beat-btn selected" onclick="setBeat(4,this)">4</button>
+        <button class="beat-btn" onclick="setBeat(8,this)">8</button>
+        <button class="beat-btn" onclick="setBeat(16,this)">16</button>
+        <button class="beat-btn" onclick="setBeat(32,this)">32</button>
+      </div>
+      <div class="right-controls">
+        <button class="count-btn" id="count-in-btn" onclick="toggleCountIn()">COUNT IN</button>
+        <div class="repeat-control">
+          <button class="repeat-adj" id="repeat-dec">−</button>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+            <span class="repeat-val" id="repeat-val">∞</span>
+            <span class="repeat-label">REPEAT</span>
+          </div>
+          <button class="repeat-adj" id="repeat-inc">+</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="grid-section" id="grid-section"></div>
@@ -250,6 +272,9 @@ body.playing .cell.on-bd.current  { background: #d8b4fe; border-color: transpare
 const LS_KEY = 'drummachine_presets_v5';
 const LS_SESSION = 'drummachine_session_v1';
 let audioCtx, isPlaying = false, currentStep = 0, timerID = null;
+let countInEnabled = false;
+let repeatCount = 0; // 0 = infinite
+let currentRepeat = 0;
 let beatMode = 4, bpm = 120;
 let vols = { hh: 0.7, bd: 0.9, sn: 0.8, ht: 0.7, lt: 0.7, cy: 0.6, rd: 0.6, ft: 0.7 };
 let activePreset = 0;
@@ -568,7 +593,7 @@ function updateVol() {
 function saveSession() {
   try {
     localStorage.setItem(LS_SESSION, JSON.stringify({
-      activePreset, beatMode, bpm, vols
+      activePreset, beatMode, bpm, vols, countInEnabled, repeatCount
     }));
   } catch(e) {}
 }
@@ -579,6 +604,14 @@ function restoreSession() {
     if (!s) return false;
     const d = JSON.parse(s);
     if (d.vols) vols = d.vols;
+    if (d.countInEnabled) {
+      countInEnabled = d.countInEnabled;
+      document.getElementById('count-in-btn').classList.toggle('active', countInEnabled);
+    }
+    if (d.repeatCount != null) {
+      repeatCount = d.repeatCount;
+      document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+    }
     if (d.beatMode) {
       beatMode = d.beatMode;
       document.querySelectorAll('.beat-btn').forEach(b => {
@@ -615,6 +648,34 @@ function getStepInterval() {
 
 function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function scheduleClick(t) {
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.04, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 8);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buf;
+  const noiseFilter = audioCtx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = 2800;
+  noiseFilter.Q.value = 1.5;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(0.4, t);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(audioCtx.destination);
+  noise.start(t);
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1100, t);
+  osc.frequency.exponentialRampToValueAtTime(600, t + 0.02);
+  const oscGain = audioCtx.createGain();
+  oscGain.gain.setValueAtTime(0.22, t);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+  osc.connect(oscGain); oscGain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t + 0.04);
 }
 
 function playKick(t) {
@@ -832,19 +893,76 @@ function scheduleStep(stepIdx, time) {
   }, Math.max(0, delay));
 }
 
+function toggleCountIn() {
+  countInEnabled = !countInEnabled;
+  document.getElementById('count-in-btn').classList.toggle('active', countInEnabled);
+  saveSession();
+}
+
+function changeRepeat(delta) {
+  repeatCount = Math.max(0, Math.min(64, repeatCount + delta));
+  document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+  saveSession();
+}
+
+function setupRepeatBtn(btnId, delta) {
+  const btn = document.getElementById(btnId);
+  let holdTimer = null, repeatTimer = null;
+  function start() {
+    changeRepeat(delta);
+    holdTimer = setTimeout(() => {
+      repeatTimer = setInterval(() => changeRepeat(delta), 80);
+    }, 400);
+  }
+  function stop() {
+    clearTimeout(holdTimer); clearInterval(repeatTimer);
+    holdTimer = null; repeatTimer = null;
+  }
+  btn.addEventListener('mousedown', start);
+  btn.addEventListener('touchstart', e => { e.preventDefault(); start(); }, { passive: false });
+  btn.addEventListener('mouseup', stop);
+  btn.addEventListener('mouseleave', stop);
+  btn.addEventListener('touchend', stop);
+  btn.addEventListener('touchcancel', stop);
+}
+
 function scheduler() {
   const n = getStepCount();
   const stepSecs = getStepInterval() / 1000;
   while (nextStepTime < audioCtx.currentTime + LOOKAHEAD) {
     scheduleStep(currentStep, nextStepTime);
     nextStepTime += stepSecs;
-    currentStep = (currentStep + 1) % n;
+    currentStep++;
+    if (currentStep >= n) {
+      currentStep = 0;
+      if (repeatCount > 0) {
+        currentRepeat++;
+        if (currentRepeat >= repeatCount) {
+          // Schedule stop after last step finishes
+          const delay = (nextStepTime - audioCtx.currentTime) * 1000;
+          setTimeout(() => { if (isPlaying) togglePlay(); }, delay + 100);
+          return;
+        }
+      }
+    }
   }
   timerID = setTimeout(scheduler, SCHEDULE_INTERVAL);
 }
 
 function startTimer() {
   nextStepTime = audioCtx.currentTime + 0.05;
+  if (countInEnabled) {
+    const stepSecs = getStepInterval() / 1000;
+    // 1拍あたりのステップ数: 4beat=1step, 8beat=2steps, 16beat=4steps, 32beat=8steps
+    const stepsPerBeat = beatMode / 4;
+    const beatSecs = stepSecs * stepsPerBeat;
+    let t = nextStepTime;
+    for (let i = 0; i < 4; i++) {
+      scheduleClick(t);
+      t += beatSecs;
+    }
+    nextStepTime = t;
+  }
   scheduler();
 }
 function togglePlay() {
@@ -857,6 +975,7 @@ function togglePlay() {
     btn.classList.add('playing');
     document.body.classList.add('playing');
     icon.innerHTML = '<rect x="3" y="2" width="5" height="16" rx="1"/><rect x="12" y="2" width="5" height="16" rx="1"/>';
+    currentRepeat = 0;
     currentStep = 0; startTimer();
   } else {
     btn.classList.remove('playing');
@@ -869,6 +988,8 @@ function togglePlay() {
 }
 
 buildPresetRow();
+setupRepeatBtn('repeat-dec', -1);
+setupRepeatBtn('repeat-inc', +1);
 const restoredPreset = restoreSession();
 loadPreset(restoredPreset !== false ? restoredPreset : 0);
 
