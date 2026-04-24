@@ -602,6 +602,7 @@ function toggleCell(drumId, stepIdx) {
     if (steps[drumId][stepIdx]) cell.classList.add(`on-${drumId}`);
     else cell.classList.remove(`on-${drumId}`);
   }
+  saveSession();
 }
 
 function updateVol() {
