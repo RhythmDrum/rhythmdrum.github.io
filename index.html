@@ -365,6 +365,7 @@ function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 
+// BD: Classic Rock Kick
 function playKick(t) {
   const g = audioCtx.createGain();
   g.gain.setValueAtTime(vols.bd*1.2,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
@@ -372,45 +373,42 @@ function playKick(t) {
   const osc = audioCtx.createOscillator();
   osc.frequency.setValueAtTime(160,t); osc.frequency.exponentialRampToValueAtTime(40,t+0.15);
   osc.connect(g); osc.start(t); osc.stop(t+0.5);
-  const noise = audioCtx.createBufferSource();
   const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.05,audioCtx.sampleRate);
   const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.3;
-  noise.buffer=buf;
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.3;
+  const noise = audioCtx.createBufferSource(); noise.buffer=buf;
   const ng = audioCtx.createGain();
   ng.gain.setValueAtTime(vols.bd*0.4,t); ng.gain.exponentialRampToValueAtTime(0.001,t+0.05);
   noise.connect(ng); ng.connect(audioCtx.destination); noise.start(t);
 }
 
+// SN: Standard Rock
 function playSnare(t) {
-  const noise = audioCtx.createBufferSource();
-  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.2,audioCtx.sampleRate);
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.25,audioCtx.sampleRate);
   const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-  noise.buffer=buf;
-  const filter = audioCtx.createBiquadFilter();
-  filter.type='highpass'; filter.frequency.value=1000;
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const noise = audioCtx.createBufferSource(); noise.buffer=buf;
+  const f = audioCtx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2500; f.Q.value=0.7;
   const g = audioCtx.createGain();
-  g.gain.setValueAtTime(vols.sn*0.8,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
-  noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination); noise.start(t);
+  g.gain.setValueAtTime(vols.sn*1.0,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+  noise.connect(f); f.connect(g); g.connect(audioCtx.destination); noise.start(t);
   const osc = audioCtx.createOscillator();
-  osc.frequency.setValueAtTime(200,t); osc.frequency.exponentialRampToValueAtTime(100,t+0.1);
+  osc.frequency.setValueAtTime(220,t); osc.frequency.exponentialRampToValueAtTime(80,t+0.12);
   const og = audioCtx.createGain();
-  og.gain.setValueAtTime(vols.sn*0.5,t); og.gain.exponentialRampToValueAtTime(0.001,t+0.1);
-  osc.connect(og); og.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.1);
+  og.gain.setValueAtTime(vols.sn*0.7,t); og.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+  osc.connect(og); og.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.15);
 }
 
+// HH: Classic Closed
 function playHihat(t) {
-  const noise = audioCtx.createBufferSource();
   const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.08,audioCtx.sampleRate);
   const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-  noise.buffer=buf;
-  const filter = audioCtx.createBiquadFilter();
-  filter.type='highpass'; filter.frequency.value=7000;
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const noise = audioCtx.createBufferSource(); noise.buffer=buf;
+  const f = audioCtx.createBiquadFilter(); f.type='highpass'; f.frequency.value=7000;
   const g = audioCtx.createGain();
-  g.gain.setValueAtTime(vols.hh*0.6,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.06);
-  noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination); noise.start(t);
+  g.gain.setValueAtTime(vols.hh*0.7,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+  noise.connect(f); f.connect(g); g.connect(audioCtx.destination); noise.start(t);
 }
 
 // Lookahead scheduler - schedules audio ahead of time for accurate timing
