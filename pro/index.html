@@ -59,6 +59,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .cell:hover { border-color: #666; background: #363636; }
 .cell.on-cy  { background: var(--cy); border-color: transparent; }
 .cell.on-rd  { background: var(--rd); border-color: transparent; }
+.cell.on-rd-cup { background: var(--rd); border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; }
 .cell.on-hh  { background: var(--hh); border-color: transparent; }
 .cell.on-hh-open { background: var(--hh); border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; }
 .cell.on-ht  { background: var(--ht); border-color: transparent; }
@@ -69,6 +70,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .cell.on-bd  { background: var(--bd); border-color: transparent; }
 body.playing .cell.on-cy  { background: #7f1d1d; border-color: transparent; }
 body.playing .cell.on-rd  { background: #7c2d12; border-color: transparent; }
+body.playing .cell.on-rd-cup { background: #7c2d12; border-color: transparent; outline: 2px solid rgba(0,0,0,0.5); outline-offset: -4px; }
 body.playing .cell.on-hh  { background: #713f12; border-color: transparent; }
 body.playing .cell.on-hh-open { background: #713f12; border-color: transparent; outline: 2px solid rgba(0,0,0,0.5); outline-offset: -4px; }
 body.playing .cell.on-ht  { background: #365314; border-color: transparent; }
@@ -79,6 +81,7 @@ body.playing .cell.on-ft  { background: #312e81; border-color: transparent; }
 body.playing .cell.on-bd  { background: #581c87; border-color: transparent; }
 body.playing .cell.on-cy.current  { background: #fca5a5; border-color: transparent; box-shadow: none; }
 body.playing .cell.on-rd.current  { background: #fdba74; border-color: transparent; box-shadow: none; }
+body.playing .cell.on-rd-cup.current { background: #fdba74; border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; box-shadow: none; }
 body.playing .cell.on-hh.current  { background: #fde047; border-color: transparent; box-shadow: none; }
 body.playing .cell.on-hh-open.current { background: #fde047; border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; box-shadow: none; }
 body.playing .cell.on-ht.current  { background: #bef264; border-color: transparent; box-shadow: none; }
@@ -87,7 +90,7 @@ body.playing .cell.on-sn.current  { background: #93c5fd; border-color: transpare
 body.playing .cell.on-sn-rim.current { background: #93c5fd; border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; box-shadow: none; }
 body.playing .cell.on-ft.current  { background: #a5b4fc; border-color: transparent; box-shadow: none; }
 body.playing .cell.on-bd.current  { background: #d8b4fe; border-color: transparent; box-shadow: none; }
-.cell.current:not(.on-bd):not(.on-sn):not(.on-sn-rim):not(.on-hh):not(.on-hh-open):not(.on-ht):not(.on-lt):not(.on-cy):not(.on-rd):not(.on-ft)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 5px; }
+.cell.current:not(.on-bd):not(.on-sn):not(.on-sn-rim):not(.on-hh):not(.on-hh-open):not(.on-ht):not(.on-lt):not(.on-cy):not(.on-rd):not(.on-rd-cup):not(.on-ft)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 5px; }
 .group-div { width: 1px; background: #444; align-self: stretch; flex-shrink: 0; }
 .vol-row { display: flex; padding: 12px 8px 10px; border: 1px solid #444; border-radius: 10px; margin-bottom: 14px; justify-content: space-around; align-items: flex-end; width: 100%; box-sizing: border-box; }
 .vol-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
@@ -272,6 +275,28 @@ body.playing .cell.on-bd.current  { background: #d8b4fe; border-color: transpare
 const LS_KEY = 'drummachine_presets_v5';
 const LS_SESSION = 'drummachine_session_v1';
 let audioCtx, isPlaying = false, currentStep = 0, timerID = null;
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch(e) {}
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) {
+    try { await wakeLock.release(); } catch(e) {}
+    wakeLock = null;
+  }
+}
+
+// 画面が再表示されたとき（再生中なら再取得）
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && isPlaying) requestWakeLock();
+});
 let countInEnabled = false;
 let repeatCount = 0; // 0 = infinite
 let currentRepeat = 0;
@@ -499,7 +524,7 @@ function loadPreset(idx) {
     document.getElementById('repeat-val').textContent = '∞';
   }
   [4, 8, 16, 32].forEach(mode => {
-    ['bd','ht','lt','cy','rd','ft'].forEach(d => {
+    ['bd','ht','lt','cy','ft'].forEach(d => {
       allSteps[mode][d] = (p[mode][d] || Array(mode).fill(0)).map(v => !!v);
     });
     allSteps[mode].hh = (p[mode].hh || Array(mode).fill(0)).map(v => {
@@ -509,6 +534,10 @@ function loadPreset(idx) {
     allSteps[mode].sn = (p[mode].sn || Array(mode).fill(0)).map(v => {
       if (v === 's' || v === 'r') return v;
       return v ? 's' : 0;
+    });
+    allSteps[mode].rd = (p[mode].rd || Array(mode).fill(0)).map(v => {
+      if (v === 'e' || v === 'u') return v;
+      return v ? 'e' : 0;
     });
   });
   if (isPlaying) { clearInterval(timerID); currentStep = 0; startTimer(); }
@@ -553,6 +582,10 @@ function buildGrid() {
           const v = steps.sn[stepIdx];
           if (v === 's') cell.classList.add('on-sn');
           else if (v === 'r') cell.classList.add('on-sn-rim');
+        } else if (drum.id === 'rd') {
+          const v = steps.rd[stepIdx];
+          if (v === 'e') cell.classList.add('on-rd');
+          else if (v === 'u') cell.classList.add('on-rd-cup');
         } else {
           if (steps[drum.id][stepIdx]) cell.classList.add(`on-${drum.id}`);
         }
@@ -596,6 +629,20 @@ function toggleCell(drumId, stepIdx) {
     } else {
       steps.sn[stepIdx] = 0;
       cell.classList.remove('on-sn', 'on-sn-rim');
+    }
+  } else if (drumId === 'rd') {
+    const cur = steps.rd[stepIdx];
+    if (!cur) {
+      steps.rd[stepIdx] = 'e';
+      cell.classList.remove('on-rd-cup');
+      cell.classList.add('on-rd');
+    } else if (cur === 'e') {
+      steps.rd[stepIdx] = 'u';
+      cell.classList.remove('on-rd');
+      cell.classList.add('on-rd-cup');
+    } else {
+      steps.rd[stepIdx] = 0;
+      cell.classList.remove('on-rd', 'on-rd-cup');
     }
   } else {
     steps[drumId][stepIdx] = !steps[drumId][stepIdx];
@@ -655,7 +702,7 @@ function restoreSession() {
     if (d.allSteps) {
       [4, 8, 16, 32].forEach(mode => {
         if (!d.allSteps[mode]) return;
-        ['bd','ht','lt','cy','rd','ft'].forEach(drum => {
+        ['bd','ht','lt','cy','ft'].forEach(drum => {
           allSteps[mode][drum] = (d.allSteps[mode][drum] || Array(mode).fill(0)).map(v => !!v);
         });
         allSteps[mode].hh = (d.allSteps[mode].hh || Array(mode).fill(0)).map(v => {
@@ -665,6 +712,10 @@ function restoreSession() {
         allSteps[mode].sn = (d.allSteps[mode].sn || Array(mode).fill(0)).map(v => {
           if (v === 's' || v === 'r') return v;
           return v ? 's' : 0;
+        });
+        allSteps[mode].rd = (d.allSteps[mode].rd || Array(mode).fill(0)).map(v => {
+          if (v === 'e' || v === 'u') return v;
+          return v ? 'e' : 0;
         });
       });
     }
@@ -881,27 +932,60 @@ function playFloorTom(t) {
   noise.connect(ng); ng.connect(audioCtx.destination); noise.start(t);
 }
 
-function playRide(t) {
-  // Ride cymbal: clear metallic ping with long sustain
-  const noise = audioCtx.createBufferSource();
-  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*1.2,audioCtx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-  noise.buffer=buf;
-  const bp = audioCtx.createBiquadFilter();
-  bp.type='bandpass'; bp.frequency.value=3500; bp.Q.value=2.0;
-  const hp = audioCtx.createBiquadFilter();
-  hp.type='highpass'; hp.frequency.value=2000;
-  const gn = audioCtx.createGain();
-  gn.gain.setValueAtTime(vols.rd*0.5,t); gn.gain.exponentialRampToValueAtTime(0.001,t+1.2);
-  noise.connect(bp); bp.connect(hp); hp.connect(gn); gn.connect(audioCtx.destination); noise.start(t);
-  // Ping component
-  const osc = audioCtx.createOscillator();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(3200,t);
-  const go = audioCtx.createGain();
-  go.gain.setValueAtTime(vols.rd*0.4,t); go.gain.exponentialRampToValueAtTime(0.001,t+0.6);
-  osc.connect(go); go.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.6);
+function playRide(t, cup = false) {
+  if (cup) {
+    // Cup: 短く高い金属的なピン音（bell/cup sound）
+    const osc1 = audioCtx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(2800, t);
+    const g1 = audioCtx.createGain();
+    g1.gain.setValueAtTime(vols.rd * 0.7, t);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+    osc1.connect(g1); g1.connect(audioCtx.destination);
+    osc1.start(t); osc1.stop(t + 0.25);
+
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(5200, t);
+    const g2 = audioCtx.createGain();
+    g2.gain.setValueAtTime(vols.rd * 0.35, t);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    osc2.connect(g2); g2.connect(audioCtx.destination);
+    osc2.start(t); osc2.stop(t + 0.12);
+
+    const noise = audioCtx.createBufferSource();
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.04, audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    noise.buffer = buf;
+    const bp = audioCtx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 6000; bp.Q.value = 3.0;
+    const gn = audioCtx.createGain();
+    gn.gain.setValueAtTime(vols.rd * 0.25, t);
+    gn.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    noise.connect(bp); bp.connect(gn); gn.connect(audioCtx.destination); noise.start(t);
+  } else {
+    // Edge: clear metallic ping with long sustain（既存）
+    const noise = audioCtx.createBufferSource();
+    const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*1.2,audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    noise.buffer=buf;
+    const bp = audioCtx.createBiquadFilter();
+    bp.type='bandpass'; bp.frequency.value=3500; bp.Q.value=2.0;
+    const hp = audioCtx.createBiquadFilter();
+    hp.type='highpass'; hp.frequency.value=2000;
+    const gn = audioCtx.createGain();
+    gn.gain.setValueAtTime(vols.rd*0.5,t); gn.gain.exponentialRampToValueAtTime(0.001,t+1.2);
+    noise.connect(bp); bp.connect(hp); hp.connect(gn); gn.connect(audioCtx.destination); noise.start(t);
+    // Ping component (控えめに)
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(3200,t);
+    const go = audioCtx.createGain();
+    go.gain.setValueAtTime(vols.rd*0.12,t); go.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+    osc.connect(go); go.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.25);
+  }
 }
 
 // Lookahead scheduler - schedules audio ahead of time for accurate timing
@@ -921,7 +1005,8 @@ function scheduleStep(stepIdx, time) {
   if(steps.lt[stepIdx]) playLoTom(time);
   if(steps.ft[stepIdx]) playFloorTom(time);
   if(steps.cy[stepIdx]) playCrash(time);
-  if(steps.rd[stepIdx]) playRide(time);
+  if(steps.rd[stepIdx] === 'e') playRide(time, false);
+  if(steps.rd[stepIdx] === 'u') playRide(time, true);
 
   // Schedule UI update to fire when audio actually plays
   const delay = (time - audioCtx.currentTime) * 1000;
@@ -1026,11 +1111,13 @@ function togglePlay() {
     icon.innerHTML = '<rect x="3" y="2" width="5" height="16" rx="1"/><rect x="12" y="2" width="5" height="16" rx="1"/>';
     currentRepeat = 0;
     currentStep = 0; startTimer();
+    requestWakeLock();
   } else {
     btn.classList.remove('playing');
     document.body.classList.remove('playing');
     icon.innerHTML = '<polygon points="5,2 18,10 5,18"/>';
     clearTimeout(timerID);
+    releaseWakeLock();
     document.querySelectorAll('.cell').forEach(c => c.classList.remove('current'));
     document.getElementById('beat-led').classList.remove('active');
   }
