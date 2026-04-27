@@ -797,52 +797,59 @@ function playKick(t) {
 
 function playSnare(t) {
   const noise = audioCtx.createBufferSource();
-  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.2,audioCtx.sampleRate);
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.15,audioCtx.sampleRate);
   const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
   noise.buffer=buf;
-  const filter = audioCtx.createBiquadFilter();
-  filter.type='highpass'; filter.frequency.value=1000;
+  const f = audioCtx.createBiquadFilter();
+  f.type='highpass'; f.frequency.value=4000;
   const g = audioCtx.createGain();
-  g.gain.setValueAtTime(vols.sn*0.8,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
-  noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination); noise.start(t);
+  g.gain.setValueAtTime(vols.sn*1.1,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+  noise.connect(f); f.connect(g); g.connect(audioCtx.destination); noise.start(t);
   const osc = audioCtx.createOscillator();
-  osc.frequency.setValueAtTime(200,t); osc.frequency.exponentialRampToValueAtTime(100,t+0.1);
+  osc.frequency.setValueAtTime(250,t);
+  osc.frequency.exponentialRampToValueAtTime(120,t+0.06);
   const og = audioCtx.createGain();
-  og.gain.setValueAtTime(vols.sn*0.5,t); og.gain.exponentialRampToValueAtTime(0.001,t+0.1);
-  osc.connect(og); og.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.1);
+  og.gain.setValueAtTime(vols.sn*0.7,t);
+  og.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+  osc.connect(og); og.connect(audioCtx.destination); osc.start(t); osc.stop(t+0.07);
+  const snap = audioCtx.createBufferSource();
+  const sbuf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.008,audioCtx.sampleRate);
+  const sd = sbuf.getChannelData(0);
+  for(let i=0;i<sd.length;i++) sd[i]=Math.random()*2-1;
+  snap.buffer=sbuf;
+  const sg = audioCtx.createGain();
+  sg.gain.setValueAtTime(vols.sn*1.2,t);
+  sg.gain.exponentialRampToValueAtTime(0.001,t+0.008);
+  snap.connect(sg); sg.connect(audioCtx.destination); snap.start(t);
 }
 
 function playRimshot(t) {
-  // Rimshot: sharp click with high-pitched woody tone
   const osc1 = audioCtx.createOscillator();
-  osc1.frequency.setValueAtTime(1200, t);
-  osc1.frequency.exponentialRampToValueAtTime(600, t + 0.04);
+  osc1.frequency.setValueAtTime(1200,t);
+  osc1.frequency.exponentialRampToValueAtTime(600,t+0.04);
   const g1 = audioCtx.createGain();
-  g1.gain.setValueAtTime(vols.sn * 1.0, t);
-  g1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-  osc1.connect(g1); g1.connect(audioCtx.destination);
-  osc1.start(t); osc1.stop(t + 0.05);
-
+  g1.gain.setValueAtTime(vols.sn*1.0,t);
+  g1.gain.exponentialRampToValueAtTime(0.001,t+0.05);
+  osc1.connect(g1); g1.connect(audioCtx.destination); osc1.start(t); osc1.stop(t+0.05);
   const osc2 = audioCtx.createOscillator();
-  osc2.frequency.setValueAtTime(400, t);
+  osc2.frequency.setValueAtTime(400,t);
   const g2 = audioCtx.createGain();
-  g2.gain.setValueAtTime(vols.sn * 0.6, t);
-  g2.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
-  osc2.connect(g2); g2.connect(audioCtx.destination);
-  osc2.start(t); osc2.stop(t + 0.03);
-
+  g2.gain.setValueAtTime(vols.sn*0.6,t);
+  g2.gain.exponentialRampToValueAtTime(0.001,t+0.03);
+  osc2.connect(g2); g2.connect(audioCtx.destination); osc2.start(t); osc2.stop(t+0.03);
   const noise = audioCtx.createBufferSource();
-  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.03, audioCtx.sampleRate);
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.03,audioCtx.sampleRate);
   const d = buf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  noise.buffer = buf;
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = 'bandpass'; filter.frequency.value = 3000; filter.Q.value = 0.8;
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  noise.buffer=buf;
+  const f = audioCtx.createBiquadFilter();
+  f.type='bandpass'; f.frequency.value=3000; f.Q.value=0.8;
   const gn = audioCtx.createGain();
-  gn.gain.setValueAtTime(vols.sn * 0.4, t);
-  gn.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
-  noise.connect(filter); filter.connect(gn); gn.connect(audioCtx.destination); noise.start(t);
+  gn.gain.setValueAtTime(vols.sn*0.4,t);
+  gn.gain.exponentialRampToValueAtTime(0.001,t+0.03);
+  noise.connect(f); f.connect(gn); gn.connect(audioCtx.destination); noise.start(t);
 }
 
 function playHihat(t, open = false) {
@@ -867,20 +874,33 @@ function playHihat(t, open = false) {
 
 function playHiTom(t) {
   const g = audioCtx.createGain();
-  g.gain.setValueAtTime(vols.ht*1.0,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+  g.gain.setValueAtTime(vols.ht*1.0,t);
+  g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
   g.connect(audioCtx.destination);
   const osc = audioCtx.createOscillator();
-  osc.frequency.setValueAtTime(320,t); osc.frequency.exponentialRampToValueAtTime(180,t+0.15);
-  osc.connect(g); osc.start(t); osc.stop(t+0.3);
+  osc.frequency.setValueAtTime(220,t);
+  osc.frequency.exponentialRampToValueAtTime(100,t+0.25);
+  osc.connect(g); osc.start(t); osc.stop(t+0.5);
+  const osc2 = audioCtx.createOscillator();
+  osc2.type='triangle';
+  osc2.frequency.setValueAtTime(440,t);
+  osc2.frequency.exponentialRampToValueAtTime(200,t+0.1);
+  const g2 = audioCtx.createGain();
+  g2.gain.setValueAtTime(vols.ht*0.3,t);
+  g2.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+  osc2.connect(g2); g2.connect(audioCtx.destination);
+  osc2.start(t); osc2.stop(t+0.1);
   const noise = audioCtx.createBufferSource();
-  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.04,audioCtx.sampleRate);
+  const buf = audioCtx.createBuffer(1,audioCtx.sampleRate*0.06,audioCtx.sampleRate);
   const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.25;
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.2;
   noise.buffer=buf;
   const ng = audioCtx.createGain();
-  ng.gain.setValueAtTime(vols.ht*0.3,t); ng.gain.exponentialRampToValueAtTime(0.001,t+0.04);
+  ng.gain.setValueAtTime(vols.ht*0.25,t);
+  ng.gain.exponentialRampToValueAtTime(0.001,t+0.06);
   noise.connect(ng); ng.connect(audioCtx.destination); noise.start(t);
 }
+
 
 function playLoTom(t) {
   const g = audioCtx.createGain();
