@@ -169,8 +169,9 @@ let beatMode = 8, bpm = 120;
 let vols = { hh: 0.8, bd: 0.8, sn: 0.8 };
 let activePreset = 0;
 let countInEnabled = false;
-let repeatCount = 0; // 0 = infinite
+const allRepeat = { 4: 0, 8: 0, 16: 0 }; // 0 = infinite, per beat mode
 let currentRepeat = 0;
+function repeatCount() { return allRepeat[beatMode]; }
 
 const DRUMS = [
   { id: 'hh', label: 'HH', color: '#4CD964' },
@@ -287,6 +288,7 @@ function buildPresetRow() {
 function savePreset(idx) {
   savedPresets[idx] = {
     bpm,
+    repeat4: allRepeat[4], repeat8: allRepeat[8], repeat16: allRepeat[16],
     4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd]  },
     8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd]  },
     16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd] },
@@ -307,6 +309,15 @@ function loadPreset(idx) {
   bpm = p.bpm;
   document.getElementById('bpm-val').textContent = bpm;
   document.getElementById('bpm-slider').value = bpm;
+  if ('repeatCount' in p) {
+    // 旧フォーマット互換
+    allRepeat[4] = allRepeat[8] = allRepeat[16] = p.repeatCount;
+  } else {
+    allRepeat[4]  = p.repeat4  ?? 0;
+    allRepeat[8]  = p.repeat8  ?? 0;
+    allRepeat[16] = p.repeat16 ?? 0;
+  }
+  document.getElementById('repeat-val').textContent = allRepeat[beatMode] === 0 ? '∞' : allRepeat[beatMode];
   [4, 8, 16].forEach(mode => {
     ['hh','sn','bd'].forEach(d => { allSteps[mode][d] = p[mode][d].map(v => !!v); });
   });
@@ -369,6 +380,7 @@ function setBeat(n, btn) {
   document.querySelectorAll('.beat-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   beatMode = n; currentStep = 0; buildGrid();
+  document.getElementById('repeat-val').textContent = allRepeat[beatMode] === 0 ? '∞' : allRepeat[beatMode];
 }
 
 function setBPM(v) {
@@ -503,9 +515,9 @@ function scheduler() {
     currentStep++;
     if (currentStep >= n) {
       currentStep = 0;
-      if (repeatCount > 0) {
+      if (repeatCount() > 0) {
         currentRepeat++;
-        if (currentRepeat >= repeatCount) {
+        if (currentRepeat >= repeatCount()) {
           const delay = (nextStepTime - audioCtx.currentTime) * 1000;
           setTimeout(() => { if (isPlaying) togglePlay(); }, delay + 100);
           return;
@@ -576,7 +588,7 @@ function saveSession() {
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify({
       bpm, beatMode, activePreset,
-      vols, countInEnabled, repeatCount,
+      vols, countInEnabled, allRepeat,
       steps4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd]  },
       steps8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd]  },
       steps16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd] },
@@ -597,9 +609,15 @@ function restoreSession() {
       countInEnabled = s.countInEnabled;
       document.getElementById('count-in-btn').classList.toggle('active', countInEnabled);
     }
-    if (s.repeatCount != null) {
-      repeatCount = s.repeatCount;
-      document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+    if (s.allRepeat) {
+      allRepeat[4]  = s.allRepeat[4]  ?? 0;
+      allRepeat[8]  = s.allRepeat[8]  ?? 0;
+      allRepeat[16] = s.allRepeat[16] ?? 0;
+      document.getElementById('repeat-val').textContent = allRepeat[s.beatMode || 8] === 0 ? '∞' : allRepeat[s.beatMode || 8];
+    } else if (s.repeatCount != null) {
+      // 旧フォーマット互換
+      allRepeat[4] = allRepeat[8] = allRepeat[16] = s.repeatCount;
+      document.getElementById('repeat-val').textContent = s.repeatCount === 0 ? '∞' : s.repeatCount;
     }
     if (s.steps4)  { allSteps[4]  = { hh:s.steps4.hh.map(v=>!!v),  sn:s.steps4.sn.map(v=>!!v),  bd:s.steps4.bd.map(v=>!!v)  }; }
     if (s.steps8)  { allSteps[8]  = { hh:s.steps8.hh.map(v=>!!v),  sn:s.steps8.sn.map(v=>!!v),  bd:s.steps8.bd.map(v=>!!v)  }; }
@@ -614,8 +632,8 @@ function toggleCountIn() {
 }
 
 function changeRepeat(delta) {
-  repeatCount = Math.max(0, Math.min(64, repeatCount + delta));
-  document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+  allRepeat[beatMode] = Math.max(0, Math.min(64, allRepeat[beatMode] + delta));
+  document.getElementById('repeat-val').textContent = allRepeat[beatMode] === 0 ? '∞' : allRepeat[beatMode];
 }
 
 function setupRepeatBtn(btnId, delta) {
