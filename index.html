@@ -21,7 +21,7 @@
 }
 html { background: #000; }
 body { background: #000; font-family: 'Helvetica Neue', Arial, Meiryo, sans-serif; }
-.rd-wrap { background: #000; padding: 24px 20px 0 20px; color: var(--text-primary); user-select: none; }
+.rd-wrap { background: #000; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)) 20px; color: var(--text-primary); user-select: none; }
 .rd-led { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: background 0.05s, box-shadow 0.05s; display: inline-block; }
 .rd-led.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 .controls-col { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; }
@@ -59,14 +59,14 @@ body.playing .cell.on-bd.current { background: #29AAEE; border-color: #1a88cc; b
 body.playing .cell.on-sn.current { background: #FF3D7F; border-color: #cc1f5f; box-shadow: none; }
 body.playing .cell.on-hh.current { background: #4CD964; border-color: #2aaa3a; box-shadow: none; }
 .cell.current:not(.on-bd):not(.on-sn):not(.on-hh)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 3px; z-index: 2; }
-.group-div { width: 1px; background: #444; align-self: stretch; flex-shrink: 0; }
+.group-div { width: 1px; background: #2a2a2a; align-self: stretch; flex-shrink: 0; }
 .vol-row { display: flex; gap: 20px; padding: 10px 22px 16px; border: 1px solid #444; border-radius: 8px; margin-bottom: 12px; align-items: flex-start; }
 .vol-item { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 0; }
 .vol-item label { font-size: 10px; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 4px; white-space: nowrap; margin-bottom: 2px; }
 .vol-dot { display: none; }
-.vol-slider#vol-hh::-webkit-slider-thumb { background: #4CD964 !important; }
-.vol-slider#vol-sn::-webkit-slider-thumb { background: #FF3D7F !important; }
-.vol-slider#vol-bd::-webkit-slider-thumb { background: #29AAEE !important; }
+.vol-slider#vol-hh::-webkit-slider-thumb { background: #38b84e !important; }
+.vol-slider#vol-sn::-webkit-slider-thumb { background: #d42d68 !important; }
+.vol-slider#vol-bd::-webkit-slider-thumb { background: #1e8ec8 !important; }
 .vol-slider { width: 100% !important; min-width: 0; max-width: 100%; }
 .preset-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
 .preset-btn-wrap { flex: 1; position: relative; }
@@ -83,23 +83,20 @@ body.playing .cell.on-hh.current { background: #4CD964; border-color: #2aaa3a; b
 .hold-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: #E24B4A; width: 0%; border-radius: 0 0 4px 4px; pointer-events: none; }
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 8px 18px; font-size: 12px; color: var(--text-primary); letter-spacing: 1px; opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap; z-index: 99; }
 .toast.show { opacity: 1; }
-.footer {
-  position: fixed;
-  left: 0; right: 0;
-  bottom: 0;
-  height: var(--footer-h, 100px);
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  z-index: 10;
-}
+.footer { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 12px; }
 .rd-title { font-size: 22px; letter-spacing:1.5px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-.play-btn { width: 52px; height: 52px; min-width: 52px; min-height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); flex-shrink: 0; }
+.play-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); }
 .play-btn:hover { background: rgba(239,159,39,0.1); }
 .play-btn.playing { background: var(--accent); color: #000; }
+.beat-controls-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.right-controls { display: flex; align-items: center; gap: 6px; }
+.count-btn { background: #2e2e2e; border: 1px solid #444; border-radius: 6px; color: var(--text-muted); font-size: 10px; letter-spacing: 1px; padding: 4px 8px; cursor: pointer; transition: all 0.1s; white-space: nowrap; }
+.count-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(239,159,39,0.08); }
+.repeat-control { display: flex; align-items: center; gap: 4px; }
+.repeat-adj { width: 22px; height: 22px; border-radius: 4px; border: 1px solid #444; background: #2e2e2e; color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; line-height: 1; padding: 0; }
+.repeat-adj:hover { background: #3a3a3a; border-color: #666; }
+.repeat-val { font-size: 12px; color: var(--text-primary); min-width: 24px; text-align: center; }
+.repeat-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -119,10 +116,23 @@ body.playing .cell.on-hh.current { background: #4CD964; border-color: #2aaa3a; b
       </div>
       <span class="ctrl-label" style="text-align:center; margin-top:0;">BPM</span>
     </div>
-    <div class="beat-btns">
-      <button class="beat-btn" onclick="setBeat(4,this)">4</button>
-      <button class="beat-btn selected" onclick="setBeat(8,this)">8</button>
-      <button class="beat-btn" onclick="setBeat(16,this)">16</button>
+    <div class="beat-controls-row">
+      <div class="beat-btns">
+        <button class="beat-btn" onclick="setBeat(4,this)">4</button>
+        <button class="beat-btn selected" onclick="setBeat(8,this)">8</button>
+        <button class="beat-btn" onclick="setBeat(16,this)">16</button>
+      </div>
+      <div class="right-controls">
+        <button class="count-btn" id="count-in-btn" onclick="toggleCountIn()">COUNT IN</button>
+        <div class="repeat-control">
+          <button class="repeat-adj" id="repeat-dec">−</button>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
+            <span class="repeat-val" id="repeat-val">∞</span>
+            <span class="repeat-label">REPEAT</span>
+          </div>
+          <button class="repeat-adj" id="repeat-inc">+</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="grid-section" id="grid-section"></div>
@@ -158,6 +168,9 @@ let audioCtx, isPlaying = false, currentStep = 0, timerID = null;
 let beatMode = 8, bpm = 120;
 let vols = { hh: 0.8, bd: 0.8, sn: 0.8 };
 let activePreset = 0;
+let countInEnabled = false;
+let repeatCount = 0; // 0 = infinite
+let currentRepeat = 0;
 
 const DRUMS = [
   { id: 'hh', label: 'HH', color: '#4CD964' },
@@ -376,6 +389,34 @@ function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 
+function scheduleClick(t) {
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.04, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 8);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buf;
+  const noiseFilter = audioCtx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = 2800;
+  noiseFilter.Q.value = 1.5;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(0.4, t);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(audioCtx.destination);
+  noise.start(t);
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1100, t);
+  osc.frequency.exponentialRampToValueAtTime(600, t + 0.02);
+  const oscGain = audioCtx.createGain();
+  oscGain.gain.setValueAtTime(0.22, t);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+  osc.connect(oscGain); oscGain.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t + 0.04);
+}
+
 // BD: Classic Rock Kick
 function playKick(t) {
   const g = audioCtx.createGain();
@@ -459,13 +500,35 @@ function scheduler() {
   while (nextStepTime < audioCtx.currentTime + LOOKAHEAD) {
     scheduleStep(currentStep, nextStepTime);
     nextStepTime += stepSecs;
-    currentStep = (currentStep + 1) % n;
+    currentStep++;
+    if (currentStep >= n) {
+      currentStep = 0;
+      if (repeatCount > 0) {
+        currentRepeat++;
+        if (currentRepeat >= repeatCount) {
+          const delay = (nextStepTime - audioCtx.currentTime) * 1000;
+          setTimeout(() => { if (isPlaying) togglePlay(); }, delay + 100);
+          return;
+        }
+      }
+    }
   }
   timerID = setTimeout(scheduler, SCHEDULE_INTERVAL);
 }
 
 function startTimer() {
   nextStepTime = audioCtx.currentTime + 0.05;
+  if (countInEnabled) {
+    const stepSecs = getStepInterval() / 1000;
+    const stepsPerBeat = beatMode / 4;
+    const beatSecs = stepSecs * stepsPerBeat;
+    let t = nextStepTime;
+    for (let i = 0; i < 4; i++) {
+      scheduleClick(t);
+      t += beatSecs;
+    }
+    nextStepTime = t;
+  }
   scheduler();
 }
 // Wake Lock - prevent screen from sleeping during playback
@@ -493,6 +556,7 @@ function togglePlay() {
     btn.classList.add('playing');
     document.body.classList.add('playing');
     icon.innerHTML = '<rect x="3" y="2" width="5" height="16" rx="1"/><rect x="12" y="2" width="5" height="16" rx="1"/>';
+    currentRepeat = 0;
     currentStep = 0; startTimer();
     acquireWakeLock();
   } else {
@@ -512,7 +576,7 @@ function saveSession() {
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify({
       bpm, beatMode, activePreset,
-      vols,
+      vols, countInEnabled, repeatCount,
       steps4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd]  },
       steps8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd]  },
       steps16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd] },
@@ -529,6 +593,14 @@ function restoreSession() {
     beatMode = s.beatMode || 4;
     activePreset = s.activePreset || 0;
     vols = s.vols || { hh:0.8, bd:0.8, sn:0.8 };
+    if (s.countInEnabled) {
+      countInEnabled = s.countInEnabled;
+      document.getElementById('count-in-btn').classList.toggle('active', countInEnabled);
+    }
+    if (s.repeatCount != null) {
+      repeatCount = s.repeatCount;
+      document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+    }
     if (s.steps4)  { allSteps[4]  = { hh:s.steps4.hh.map(v=>!!v),  sn:s.steps4.sn.map(v=>!!v),  bd:s.steps4.bd.map(v=>!!v)  }; }
     if (s.steps8)  { allSteps[8]  = { hh:s.steps8.hh.map(v=>!!v),  sn:s.steps8.sn.map(v=>!!v),  bd:s.steps8.bd.map(v=>!!v)  }; }
     if (s.steps16) { allSteps[16] = { hh:s.steps16.hh.map(v=>!!v), sn:s.steps16.sn.map(v=>!!v), bd:s.steps16.bd.map(v=>!!v) }; }
@@ -536,7 +608,40 @@ function restoreSession() {
   } catch(e) { return false; }
 }
 
+function toggleCountIn() {
+  countInEnabled = !countInEnabled;
+  document.getElementById('count-in-btn').classList.toggle('active', countInEnabled);
+}
+
+function changeRepeat(delta) {
+  repeatCount = Math.max(0, Math.min(64, repeatCount + delta));
+  document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+}
+
+function setupRepeatBtn(btnId, delta) {
+  const btn = document.getElementById(btnId);
+  let holdTimer = null, repeatTimer = null;
+  function start() {
+    changeRepeat(delta);
+    holdTimer = setTimeout(() => {
+      repeatTimer = setInterval(() => changeRepeat(delta), 80);
+    }, 400);
+  }
+  function stop() {
+    clearTimeout(holdTimer); clearInterval(repeatTimer);
+    holdTimer = null; repeatTimer = null;
+  }
+  btn.addEventListener('mousedown', start);
+  btn.addEventListener('touchstart', e => { e.preventDefault(); start(); }, { passive: false });
+  btn.addEventListener('mouseup', stop);
+  btn.addEventListener('mouseleave', stop);
+  btn.addEventListener('touchend', stop);
+  btn.addEventListener('touchcancel', stop);
+}
+
 buildPresetRow();
+setupRepeatBtn('repeat-dec', -1);
+setupRepeatBtn('repeat-inc', +1);
 
 if (restoreSession()) {
   // UIに反映
@@ -594,31 +699,6 @@ setupBpmBtn('bpm-inc', +10);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
-
-// ページコンテンツ下端〜ビューポート下端の余白中央にフッターを配置
-function adjustFooter() {
-  const wrap = document.querySelector('.rd-wrap');
-  const footer = document.querySelector('.footer');
-  if (!footer || !wrap) return;
-
-  // 一旦フッターを非表示にしてコンテンツ高さを計測
-  footer.style.visibility = 'hidden';
-  wrap.style.paddingBottom = '0px';
-
-  const contentBottom = wrap.getBoundingClientRect().bottom;
-  const viewportH = window.innerHeight;
-  const remaining = viewportH - contentBottom; // コンテンツ下の余白px
-
-  // 余白が小さすぎる場合は最低限の高さを確保
-  const footerH = Math.max(remaining, 80);
-
-  document.documentElement.style.setProperty('--footer-h', footerH + 'px');
-  wrap.style.paddingBottom = footerH + 'px';
-  footer.style.visibility = '';
-}
-
-adjustFooter();
-window.addEventListener('resize', adjustFooter);
 </script>
 </body>
 </html>
