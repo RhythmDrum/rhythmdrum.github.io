@@ -45,7 +45,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .drum-dot { width: 8px; height: 8px; border-radius: 50%; }
 .cells-wrap { display: flex; gap: 4px; flex: 1; }
 .beat-group { display: flex; gap: 3px; flex: 1; }
-.cell { flex: 1; height: 42px; border-radius: 6px; background: var(--bg-cell); border: 1px solid #3a3a3a; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
+.cell { flex: 1; height: 42px; border-radius: 6px; background: var(--bg-cell); border: 1px solid #333333; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
 .cell:hover { border-color: #666; background: #3a3a3a; }
 /* ON状態：単色ベース＋中央明るい放射グラデーション */
 .cell.on-bd { background: #1e8ec8; border-color: #1470a0; }
@@ -632,22 +632,37 @@ function toggleCountIn() {
 }
 
 function changeRepeat(delta) {
-  allRepeat[beatMode] = Math.max(0, Math.min(64, allRepeat[beatMode] + delta));
+  allRepeat[beatMode] = Math.max(0, Math.min(999, allRepeat[beatMode] + delta));
   document.getElementById('repeat-val').textContent = allRepeat[beatMode] === 0 ? '∞' : allRepeat[beatMode];
 }
 
 function setupRepeatBtn(btnId, delta) {
   const btn = document.getElementById(btnId);
-  let holdTimer = null, repeatTimer = null;
+  let phase1 = null, phase2 = null, phase3 = null;
   function start() {
     changeRepeat(delta);
-    holdTimer = setTimeout(() => {
-      repeatTimer = setInterval(() => changeRepeat(delta), 80);
-    }, 400);
+    // 遅い（600ms後に200ms間隔）
+    phase1 = setTimeout(() => {
+      changeRepeat(delta);
+      let t2 = setInterval(() => changeRepeat(delta), 200);
+      phase2 = t2;
+      // 中速（1.5s後に80ms間隔）
+      phase2 = setTimeout(() => {
+        clearInterval(t2);
+        let t3 = setInterval(() => changeRepeat(delta), 80);
+        phase3 = t3;
+        // 高速（3s後に30ms間隔）
+        phase3 = setTimeout(() => {
+          clearInterval(t3);
+          phase3 = setInterval(() => changeRepeat(delta), 30);
+        }, 1500);
+      }, 1500);
+    }, 600);
   }
   function stop() {
-    clearTimeout(holdTimer); clearInterval(repeatTimer);
-    holdTimer = null; repeatTimer = null;
+    clearTimeout(phase1); clearTimeout(phase2); clearTimeout(phase3);
+    clearInterval(phase2); clearInterval(phase3);
+    phase1 = phase2 = phase3 = null;
   }
   btn.addEventListener('mousedown', start);
   btn.addEventListener('touchstart', e => { e.preventDefault(); start(); }, { passive: false });
