@@ -306,22 +306,19 @@ function buildGrid() {
     lbl.style.display = 'none';
     const wrap = document.createElement('div');
     wrap.className = 'cells-wrap';
-    const groupSize = beatMode === 4 ? 1 : (beatMode === 8 ? 2 : 4);
-    const numGroups = n / groupSize;
-    for (let g = 0; g < numGroups; g++) {
-      if (g === numGroups / 2) { const div = document.createElement('div'); div.className = 'group-div'; wrap.appendChild(div); }
-      const grp = document.createElement('div');
-      grp.className = 'beat-group';
-      for (let i = 0; i < groupSize; i++) {
-        const stepIdx = g * groupSize + i;
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.id = `cell-${drum.id}-${stepIdx}`;
-        if (steps[drum.id][stepIdx]) cell.classList.add(`on-${drum.id}`);
-        cell.onclick = () => toggleCell(drum.id, stepIdx);
-        grp.appendChild(cell);
+    const dividerAfter = beatMode === 4 ? [] : beatMode === 8 ? [3] : [3, 7, 11];
+    for (let i = 0; i < n; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.id = `cell-${drum.id}-${i}`;
+      if (steps[drum.id][i]) cell.classList.add(`on-${drum.id}`);
+      cell.onclick = () => toggleCell(drum.id, i);
+      wrap.appendChild(cell);
+      if (dividerAfter.includes(i)) {
+        const div = document.createElement('div');
+        div.className = 'group-div';
+        wrap.appendChild(div);
       }
-      wrap.appendChild(grp);
     }
     row.appendChild(wrap);
     section.appendChild(row);
