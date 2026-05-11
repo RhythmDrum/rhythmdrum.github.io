@@ -21,7 +21,7 @@
 }
 html { background: #000; }
 body { background: #000; font-family: 'Helvetica Neue', Arial, Meiryo, sans-serif; }
-.rd-wrap { background: #000; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)) 20px; color: var(--text-primary); user-select: none; }
+.rd-wrap { background: #000; padding: 24px 20px 0 20px; color: var(--text-primary); user-select: none; }
 .rd-led { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: background 0.05s, box-shadow 0.05s; display: inline-block; }
 .rd-led.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 .controls-col { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; }
@@ -83,9 +83,21 @@ body.playing .cell.on-hh.current { background: #4CD964; border-color: #2aaa3a; b
 .hold-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: #E24B4A; width: 0%; border-radius: 0 0 4px 4px; pointer-events: none; }
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 8px 18px; font-size: 12px; color: var(--text-primary); letter-spacing: 1px; opacity: 0; pointer-events: none; transition: opacity 0.2s; white-space: nowrap; z-index: 99; }
 .toast.show { opacity: 1; }
-.footer { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 12px; }
+.footer {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 0;
+  height: var(--footer-h, 100px);
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 10;
+}
 .rd-title { font-size: 22px; letter-spacing:1.5px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-.play-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); }
+.play-btn { width: 52px; height: 52px; min-width: 52px; min-height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); flex-shrink: 0; }
 .play-btn:hover { background: rgba(239,159,39,0.1); }
 .play-btn.playing { background: var(--accent); color: #000; }
 </style>
@@ -582,6 +594,31 @@ setupBpmBtn('bpm-inc', +10);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
+
+// ページコンテンツ下端〜ビューポート下端の余白中央にフッターを配置
+function adjustFooter() {
+  const wrap = document.querySelector('.rd-wrap');
+  const footer = document.querySelector('.footer');
+  if (!footer || !wrap) return;
+
+  // 一旦フッターを非表示にしてコンテンツ高さを計測
+  footer.style.visibility = 'hidden';
+  wrap.style.paddingBottom = '0px';
+
+  const contentBottom = wrap.getBoundingClientRect().bottom;
+  const viewportH = window.innerHeight;
+  const remaining = viewportH - contentBottom; // コンテンツ下の余白px
+
+  // 余白が小さすぎる場合は最低限の高さを確保
+  const footerH = Math.max(remaining, 80);
+
+  document.documentElement.style.setProperty('--footer-h', footerH + 'px');
+  wrap.style.paddingBottom = footerH + 'px';
+  footer.style.visibility = '';
+}
+
+adjustFooter();
+window.addEventListener('resize', adjustFooter);
 </script>
 </body>
 </html>
