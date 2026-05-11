@@ -638,38 +638,40 @@ function changeRepeat(delta) {
 
 function setupRepeatBtn(btnId, delta) {
   const btn = document.getElementById(btnId);
-  let phase1 = null, phase2 = null, phase3 = null;
+  let timer1 = null, timer2 = null, timer3 = null;
+  let interval1 = null, interval2 = null, interval3 = null;
+
+  function stopAll() {
+    clearTimeout(timer1); clearTimeout(timer2); clearTimeout(timer3);
+    clearInterval(interval1); clearInterval(interval2); clearInterval(interval3);
+    timer1 = timer2 = timer3 = interval1 = interval2 = interval3 = null;
+  }
+
   function start() {
+    stopAll();
     changeRepeat(delta);
-    // 遅い（600ms後に200ms間隔）
-    phase1 = setTimeout(() => {
-      changeRepeat(delta);
-      let t2 = setInterval(() => changeRepeat(delta), 200);
-      phase2 = t2;
-      // 中速（1.5s後に80ms間隔）
-      phase2 = setTimeout(() => {
-        clearInterval(t2);
-        let t3 = setInterval(() => changeRepeat(delta), 80);
-        phase3 = t3;
-        // 高速（3s後に30ms間隔）
-        phase3 = setTimeout(() => {
-          clearInterval(t3);
-          phase3 = setInterval(() => changeRepeat(delta), 30);
+    // 0.6s後: 200ms間隔でゆっくり開始
+    timer1 = setTimeout(() => {
+      interval1 = setInterval(() => changeRepeat(delta), 200);
+      // 0.6+1.5s後: 中速80ms
+      timer2 = setTimeout(() => {
+        clearInterval(interval1); interval1 = null;
+        interval2 = setInterval(() => changeRepeat(delta), 80);
+        // 0.6+1.5+1.5s後: 高速30ms
+        timer3 = setTimeout(() => {
+          clearInterval(interval2); interval2 = null;
+          interval3 = setInterval(() => changeRepeat(delta), 30);
         }, 1500);
       }, 1500);
     }, 600);
   }
-  function stop() {
-    clearTimeout(phase1); clearTimeout(phase2); clearTimeout(phase3);
-    clearInterval(phase2); clearInterval(phase3);
-    phase1 = phase2 = phase3 = null;
-  }
+
   btn.addEventListener('mousedown', start);
   btn.addEventListener('touchstart', e => { e.preventDefault(); start(); }, { passive: false });
-  btn.addEventListener('mouseup', stop);
-  btn.addEventListener('mouseleave', stop);
-  btn.addEventListener('touchend', stop);
-  btn.addEventListener('touchcancel', stop);
+  btn.addEventListener('mouseup', stopAll);
+  btn.addEventListener('mouseleave', stopAll);
+  btn.addEventListener('touchend', stopAll);
+  btn.addEventListener('touchcancel', stopAll);
 }
 
 buildPresetRow();
