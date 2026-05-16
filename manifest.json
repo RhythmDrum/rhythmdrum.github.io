@@ -1,8 +1,8 @@
 {
-  "name": "Rhythm Drum",
-  "short_name": "Rhythm Drum",
+  "name": "RHYTHM DRUM",
+  "short_name": "RHYTHM DRUM",
   "description": "A rhythm sequencer app",
-  "start_url": "https://rhythmdrum.github.io/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
