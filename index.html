@@ -45,19 +45,19 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .drum-dot { width: 8px; height: 8px; border-radius: 50%; }
 .cells-wrap { display: flex; gap: 4px; flex: 1; }
 .beat-group { display: flex; gap: 3px; flex: 1; }
-.cell { flex: 1; height: 42px; border-radius: 6px; background: var(--bg-cell); border: 1px solid #333333; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
-.cell:hover { border-color: #666; background: #3a3a3a; }
+.cell { flex: 1; height: 42px; border-radius: 6px; background: var(--bg-cell); border: none; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
+.cell:hover { background: #3a3a3a; }
 /* ON状態：単色ベース＋中央明るい放射グラデーション */
-.cell.on-bd { background: #1e8ec8; border-color: #1470a0; }
-.cell.on-sn { background: #d42d68; border-color: #aa1f52; }
-.cell.on-hh { background: #38b84e; border-color: #269438; }
-body.playing .cell { background: #111111; border-color: #252525; }
-body.playing .cell.on-bd { background: #0a3a5a; border-color: #072c44; }
-body.playing .cell.on-sn { background: #6a0e34; border-color: #4e0828; }
-body.playing .cell.on-hh { background: #0e5020; border-color: #093c17; }
-body.playing .cell.on-bd.current { background: #29AAEE; border-color: #1a88cc; box-shadow: none; }
-body.playing .cell.on-sn.current { background: #FF3D7F; border-color: #cc1f5f; box-shadow: none; }
-body.playing .cell.on-hh.current { background: #4CD964; border-color: #2aaa3a; box-shadow: none; }
+.cell.on-bd { background: #1e8ec8; }
+.cell.on-sn { background: #d42d68; }
+.cell.on-hh { background: #38b84e; }
+body.playing .cell { background: #111111; }
+body.playing .cell.on-bd { background: #0a3a5a; }
+body.playing .cell.on-sn { background: #6a0e34; }
+body.playing .cell.on-hh { background: #0e5020; }
+body.playing .cell.on-bd.current { background: #29AAEE; box-shadow: none; }
+body.playing .cell.on-sn.current { background: #FF3D7F; box-shadow: none; }
+body.playing .cell.on-hh.current { background: #4CD964; box-shadow: none; }
 .cell.current:not(.on-bd):not(.on-sn):not(.on-hh)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 3px; z-index: 2; }
 .group-div { width: 1px; background: #2a2a2a; align-self: stretch; flex-shrink: 0; }
 .vol-row { display: flex; gap: 20px; padding: 10px 22px 16px; border: 1px solid #444; border-radius: 8px; margin-bottom: 12px; align-items: flex-start; }
@@ -494,10 +494,12 @@ function scheduleStep(stepIdx, time) {
   setTimeout(() => {
     const led = document.getElementById('beat-led');
     DRUMS.forEach(drum => { const cell = document.getElementById(`cell-${drum.id}-${thisStep}`); if(cell) cell.classList.add('current'); });
-    const shouldFlashLed = beatMode !== 16 || thisStep % 4 === 0;
+    const stepsPerBeat = beatMode / 4;
+    const shouldFlashLed = thisStep % stepsPerBeat === 0;
     if (shouldFlashLed) {
       led.classList.add('active');
-      const ledDuration = beatMode === 16 ? Math.min(stepDuration * 4 * 0.8, 300) : Math.min(stepDuration * 0.8, 120);
+      const beatDuration = stepDuration * stepsPerBeat;
+      const ledDuration = Math.min(beatDuration * 0.8, 300);
       setTimeout(() => { led.classList.remove('active'); }, ledDuration);
     }
     setTimeout(() => {
