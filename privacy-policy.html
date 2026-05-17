@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プライバシーポリシー | RHYTHM DRUM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #ff3333;
+    --accent2: #ff6600;
+    --text: #e0e0e0;
+    --text-dim: #666666;
+    --text-bright: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* グリッドノイズ背景 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,51,51,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,51,51,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ヘッダー */
+  header {
+    margin-bottom: 60px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 40px;
+  }
+
+  .app-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .app-label::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 8vw, 64px);
+    letter-spacing: 0.05em;
+    color: var(--text-bright);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .update-date {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* イントロ */
+  .intro {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    margin-bottom: 48px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--text);
+  }
+
+  /* セクション */
+  section {
+    margin-bottom: 44px;
+  }
+
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--text-bright);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.05em;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 12px 0;
+  }
+
+  ul li {
+    font-size: 14px;
+    color: var(--text);
+    padding: 6px 0 6px 20px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  ul li:last-child { border-bottom: none; }
+
+  ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 10px;
+    top: 8px;
+  }
+
+  /* 強調ボックス */
+  .highlight-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  .highlight-box strong {
+    color: var(--accent2);
+    font-weight: 500;
+  }
+
+  /* お問い合わせ */
+  .contact-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-top: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-section::before {
+    content: 'CONTACT';
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: rgba(255,51,51,0.04);
+    letter-spacing: 0.1em;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .contact-section h2 {
+    border-color: var(--accent);
+  }
+
+  .contact-section a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,51,51,0.3);
+    transition: border-color 0.2s;
+  }
+
+  .contact-section a:hover {
+    border-color: var(--accent);
+  }
+
+  /* フッター */
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  .footer-copy {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="app-label">RHYTHM DRUM</div>
+    <h1>プライバシー<br>ポリシー</h1>
+    <div class="update-date">最終更新日：2026年5月17日</div>
+  </header>
+
+  <div class="intro">
+    RHYTHM DRUM（以下「本アプリ」）をご利用いただきありがとうございます。本アプリの開発者（以下「開発者」）は、ユーザーのプライバシーを尊重し、個人情報の保護に努めています。本プライバシーポリシーは、本アプリにおける情報の取り扱いについて説明するものです。
+  </div>
+
+  <section>
+    <div class="section-number">01</div>
+    <h2>収集する情報</h2>
+    <div class="highlight-box">
+      <strong>本アプリは、個人を特定できる情報を一切収集しません。</strong>
+    </div>
+    <p>本アプリはリズムシーケンサーアプリであり、以下の情報のみをお使いの端末内に保存します：</p>
+    <ul>
+      <li>リズムパターンのプリセットデータ（端末のローカルストレージに保存）</li>
+      <li>アプリの設定情報（端末のローカルストレージに保存）</li>
+    </ul>
+    <p>これらのデータは端末外部に送信されることはなく、開発者がアクセスすることもできません。</p>
+  </section>
+
+  <section>
+    <div class="section-number">02</div>
+    <h2>第三者へのデータ提供</h2>
+    <p>本アプリは、ユーザーのデータを第三者に販売・提供・開示することは一切ありません。</p>
+  </section>
+
+  <section>
+    <div class="section-number">03</div>
+    <h2>広告・アナリティクス</h2>
+    <p>本アプリは広告を表示せず、Google Analyticsなどのアナリティクスツールを使用していません。</p>
+  </section>
+
+  <section>
+    <div class="section-number">04</div>
+    <h2>インターネット接続について</h2>
+    <p>本アプリはPWA（Progressive Web App）として動作します。初回起動時および更新時にインターネット接続を使用しますが、音声生成・リズム再生などの主要機能はオフラインでも動作します。</p>
+    <ul>
+      <li>サーバーへのユーザーデータ送信は行いません</li>
+      <li>アプリファイルのキャッシュのみ端末に保存されます</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="section-number">05</div>
+    <h2>お子様のプライバシー</h2>
+    <p>本アプリは13歳未満のお子様から意図的に個人情報を収集することはありません。本アプリは年齢に関わらずご利用いただけるリズムアプリです。</p>
+  </section>
+
+  <section>
+    <div class="section-number">06</div>
+    <h2>プライバシーポリシーの変更</h2>
+    <p>本ポリシーは必要に応じて更新されることがあります。変更があった場合は、本ページにて最新版を公開します。重大な変更がある場合は、アプリ内でお知らせします。</p>
+  </section>
+
+  <div class="contact-section">
+    <div class="section-number">07</div>
+    <h2>お問い合わせ</h2>
+    <p>本プライバシーポリシーに関するご質問は、GitHubリポジトリのIssuesよりお問い合わせください。</p>
+    <p style="margin-top:12px;">
+      <a href="https://github.com/rhythmdrum/rhythmdrum.github.io/issues" target="_blank">
+        https://github.com/rhythmdrum/rhythmdrum.github.io/issues
+      </a>
+    </p>
+  </div>
+
+  <footer>
+    <div class="footer-brand">RHYTHM DRUM</div>
+    <div class="footer-copy">© 2026 RHYTHM DRUM. All rights reserved.</div>
+  </footer>
+
+</div>
+</body>
+</html>
