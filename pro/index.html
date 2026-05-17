@@ -55,8 +55,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px;
 .drum-dot { width: 8px; height: 8px; border-radius: 50%; }
 .cells-wrap { display: flex; gap: 4px; flex: 1; }
 .beat-group { display: flex; gap: 3px; flex: 1; }
-.cell { flex: 1; height: 27px; border-radius: 5px; background: var(--bg-cell); border: 1px solid #3a3a3a; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
-.cell:hover { border-color: #666; background: #363636; }
+.cell { flex: 1; height: 27px; border-radius: 5px; background: #1a1a1a; border: none; cursor: pointer; transition: all 0.08s; position: relative; overflow: hidden; }
+.cell:hover { border-color: #555; background: #252525; }
 .cell.on-cy  { background: var(--cy); border-color: transparent; }
 .cell.on-rd  { background: var(--rd); border-color: transparent; }
 .cell.on-rd-cup { background: var(--rd); border-color: transparent; outline: 2px solid rgba(0,0,0,0.6); outline-offset: -4px; }
@@ -91,7 +91,7 @@ body.playing .cell.on-sn-rim.current { background: #93c5fd; border-color: transp
 body.playing .cell.on-ft.current  { background: #a5b4fc; border-color: transparent; box-shadow: none; }
 body.playing .cell.on-bd.current  { background: #d8b4fe; border-color: transparent; box-shadow: none; }
 .cell.current:not(.on-bd):not(.on-sn):not(.on-sn-rim):not(.on-hh):not(.on-hh-open):not(.on-ht):not(.on-lt):not(.on-cy):not(.on-rd):not(.on-rd-cup):not(.on-ft)::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 5px; }
-.group-div { width: 1px; background: #444; align-self: stretch; flex-shrink: 0; }
+.group-div { width: 1px; background: #222222; align-self: stretch; flex-shrink: 0; }
 .vol-row { display: flex; padding: 12px 8px 10px; border: 1px solid #444; border-radius: 10px; margin-bottom: 14px; justify-content: space-around; align-items: flex-end; width: 100%; box-sizing: border-box; }
 .vol-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
 .vol-item label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; line-height: 1; color: var(--text-muted); }
@@ -297,10 +297,17 @@ async function releaseWakeLock() {
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && isPlaying) requestWakeLock();
 });
-let countInEnabled = false;
-let repeatCount = 0; // 0 = infinite
+// beatModeごとに独立したrepeatCountとcountInEnabled
+let repeatCounts = { 4: 0, 8: 0, 16: 0, 32: 0 };
+let countInStates = { 4: false, 8: false, 16: false, 32: false };
+// 後方互換のためのゲッター/セッター（既存コードとの統合用）
 let currentRepeat = 0;
 let beatMode = 4, bpm = 120;
+// 現在のbeatModeの値を返すアクセサ
+function getRepeatCount() { return repeatCounts[beatMode]; }
+function setRepeatCount(v) { repeatCounts[beatMode] = v; }
+function getCountInEnabled() { return countInStates[beatMode]; }
+function setCountInEnabled(v) { countInStates[beatMode] = v; }
 let vols = { hh: 0.7, bd: 0.9, sn: 0.8, ht: 0.7, lt: 0.7, cy: 0.6, rd: 0.6, ft: 0.7 };
 let activePreset = 0;
 
@@ -494,7 +501,9 @@ function buildPresetRow() {
 
 function savePreset(idx) {
   savedPresets[idx] = {
-    bpm, repeatCount,
+    bpm,
+    repeatCounts: { 4: repeatCounts[4], 8: repeatCounts[8], 16: repeatCounts[16], 32: repeatCounts[32] },
+    countInStates: { 4: countInStates[4], 8: countInStates[8], 16: countInStates[16], 32: countInStates[32] },
     4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd],  ht:[...allSteps[4].ht],  lt:[...allSteps[4].lt],  cy:[...allSteps[4].cy],  rd:[...allSteps[4].rd],  ft:[...allSteps[4].ft]  },
     8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd],  ht:[...allSteps[8].ht],  lt:[...allSteps[8].lt],  cy:[...allSteps[8].cy],  rd:[...allSteps[8].rd],  ft:[...allSteps[8].ft]  },
     16: { hh:[...allSteps[16].hh], sn:[...allSteps[16].sn], bd:[...allSteps[16].bd], ht:[...allSteps[16].ht], lt:[...allSteps[16].lt], cy:[...allSteps[16].cy], rd:[...allSteps[16].rd], ft:[...allSteps[16].ft] },
@@ -516,13 +525,23 @@ function loadPreset(idx) {
   bpm = p.bpm;
   document.getElementById('bpm-val').textContent = bpm;
   document.getElementById('bpm-slider').value = bpm;
-  if ('repeatCount' in p) {
-    repeatCount = p.repeatCount;
-    document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+  // beatModeごとのrepeatCountsとcountInStatesを復元
+  if (p.repeatCounts) {
+    [4,8,16,32].forEach(m => { repeatCounts[m] = p.repeatCounts[m] != null ? p.repeatCounts[m] : 0; });
+  } else if ('repeatCount' in p) {
+    // 旧形式との後方互換: 全beatModeに同じ値
+    [4,8,16,32].forEach(m => { repeatCounts[m] = p.repeatCount; });
   } else {
-    repeatCount = 0;
-    document.getElementById('repeat-val').textContent = '∞';
+    [4,8,16,32].forEach(m => { repeatCounts[m] = 0; });
   }
+  if (p.countInStates) {
+    [4,8,16,32].forEach(m => { countInStates[m] = !!p.countInStates[m]; });
+  } else {
+    [4,8,16,32].forEach(m => { countInStates[m] = false; });
+  }
+  // 現在のbeatModeのUIを更新
+  document.getElementById('repeat-val').textContent = repeatCounts[beatMode] === 0 ? '∞' : repeatCounts[beatMode];
+  document.getElementById('count-in-btn').classList.toggle('active', countInStates[beatMode]);
   [4, 8, 16, 32].forEach(mode => {
     ['bd','ht','lt','cy','ft'].forEach(d => {
       allSteps[mode][d] = (p[mode][d] || Array(mode).fill(0)).map(v => !!v);
@@ -563,10 +582,10 @@ function buildGrid() {
     lbl.style.display = 'none';
     const wrap = document.createElement('div');
     wrap.className = 'cells-wrap';
-    const groupSize = beatMode === 4 ? 1 : (beatMode === 8 ? 2 : 4);
+    const groupSize = 4; // 常に4ステップごとにグループ化
     const numGroups = n / groupSize;
     for (let g = 0; g < numGroups; g++) {
-      if (g === numGroups / 2) { const div = document.createElement('div'); div.className = 'group-div'; wrap.appendChild(div); }
+      if (g > 0) { const div = document.createElement('div'); div.className = 'group-div'; wrap.appendChild(div); }
       const grp = document.createElement('div');
       grp.className = 'beat-group';
       for (let i = 0; i < groupSize; i++) {
@@ -667,7 +686,7 @@ function updateVol() {
 function saveSession() {
   try {
     localStorage.setItem(LS_SESSION, JSON.stringify({
-      activePreset, beatMode, bpm, vols, countInEnabled, repeatCount,
+      activePreset, beatMode, bpm, vols, repeatCounts, countInStates,
       allSteps: {
         4:  { hh:[...allSteps[4].hh],  sn:[...allSteps[4].sn],  bd:[...allSteps[4].bd],  ht:[...allSteps[4].ht],  lt:[...allSteps[4].lt],  cy:[...allSteps[4].cy],  rd:[...allSteps[4].rd],  ft:[...allSteps[4].ft]  },
         8:  { hh:[...allSteps[8].hh],  sn:[...allSteps[8].sn],  bd:[...allSteps[8].bd],  ht:[...allSteps[8].ht],  lt:[...allSteps[8].lt],  cy:[...allSteps[8].cy],  rd:[...allSteps[8].rd],  ft:[...allSteps[8].ft]  },
@@ -684,13 +703,18 @@ function restoreSession() {
     if (!s) return false;
     const d = JSON.parse(s);
     if (d.vols) vols = d.vols;
-    if (d.countInEnabled) {
-      countInEnabled = d.countInEnabled;
-      document.getElementById('count-in-btn').classList.toggle('active', countInEnabled);
+    // 新形式: beatModeごとのrepeatCounts/countInStates
+    if (d.repeatCounts) {
+      repeatCounts = { 4: d.repeatCounts[4]||0, 8: d.repeatCounts[8]||0, 16: d.repeatCounts[16]||0, 32: d.repeatCounts[32]||0 };
+    } else if (d.repeatCount != null) {
+      // 旧形式との後方互換: 全beatModeに同じ値をセット
+      [4,8,16,32].forEach(m => { repeatCounts[m] = d.repeatCount; });
     }
-    if (d.repeatCount != null) {
-      repeatCount = d.repeatCount;
-      document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+    if (d.countInStates) {
+      countInStates = { 4: !!d.countInStates[4], 8: !!d.countInStates[8], 16: !!d.countInStates[16], 32: !!d.countInStates[32] };
+    } else if (d.countInEnabled) {
+      // 旧形式との後方互換
+      [4,8,16,32].forEach(m => { countInStates[m] = !!d.countInEnabled; });
     }
     if (d.beatMode) {
       beatMode = d.beatMode;
@@ -698,6 +722,9 @@ function restoreSession() {
         b.classList.toggle('selected', parseInt(b.textContent) === beatMode);
       });
     }
+    // 現在のbeatModeのUIを更新
+    document.getElementById('repeat-val').textContent = repeatCounts[beatMode] === 0 ? '∞' : repeatCounts[beatMode];
+    document.getElementById('count-in-btn').classList.toggle('active', countInStates[beatMode]);
     if (d.bpm) bpm = d.bpm;
     if (d.allSteps) {
       [4, 8, 16, 32].forEach(mode => {
@@ -726,7 +753,11 @@ function restoreSession() {
 function setBeat(n, btn) {
   document.querySelectorAll('.beat-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  beatMode = n; currentStep = 0; buildGrid();
+  beatMode = n; currentStep = 0;
+  // beatModeごとのrepeatCountとcountInをUIに反映
+  document.getElementById('repeat-val').textContent = repeatCounts[beatMode] === 0 ? '∞' : repeatCounts[beatMode];
+  document.getElementById('count-in-btn').classList.toggle('active', countInStates[beatMode]);
+  buildGrid();
   saveSession();
 }
 
@@ -1048,14 +1079,14 @@ function scheduleStep(stepIdx, time) {
 }
 
 function toggleCountIn() {
-  countInEnabled = !countInEnabled;
-  document.getElementById('count-in-btn').classList.toggle('active', countInEnabled);
+  countInStates[beatMode] = !countInStates[beatMode];
+  document.getElementById('count-in-btn').classList.toggle('active', countInStates[beatMode]);
   saveSession();
 }
 
 function changeRepeat(delta) {
-  repeatCount = Math.max(0, Math.min(64, repeatCount + delta));
-  document.getElementById('repeat-val').textContent = repeatCount === 0 ? '∞' : repeatCount;
+  repeatCounts[beatMode] = Math.max(0, Math.min(64, repeatCounts[beatMode] + delta));
+  document.getElementById('repeat-val').textContent = repeatCounts[beatMode] === 0 ? '∞' : repeatCounts[beatMode];
   saveSession();
 }
 
@@ -1089,9 +1120,9 @@ function scheduler() {
     currentStep++;
     if (currentStep >= n) {
       currentStep = 0;
-      if (repeatCount > 0) {
+      if (repeatCounts[beatMode] > 0) {
         currentRepeat++;
-        if (currentRepeat >= repeatCount) {
+        if (currentRepeat >= repeatCounts[beatMode]) {
           // Schedule stop after last step finishes
           const delay = (nextStepTime - audioCtx.currentTime) * 1000;
           setTimeout(() => { if (isPlaying) togglePlay(); }, delay + 100);
@@ -1105,7 +1136,7 @@ function scheduler() {
 
 function startTimer() {
   nextStepTime = audioCtx.currentTime + 0.05;
-  if (countInEnabled) {
+  if (countInStates[beatMode]) {
     const stepSecs = getStepInterval() / 1000;
     // 1拍あたりのステップ数: 4beat=1step, 8beat=2steps, 16beat=4steps, 32beat=8steps
     const stepsPerBeat = beatMode / 4;
