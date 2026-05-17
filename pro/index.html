@@ -300,6 +300,8 @@ document.addEventListener('visibilitychange', () => {
 // beatModeごとに独立したrepeatCountとcountInEnabled
 let repeatCounts = { 4: 0, 8: 0, 16: 0, 32: 0 };
 let countInEnabled = false;
+let currentRepeat = 0;
+let beatMode = 4, bpm = 120;
 let vols = { hh: 0.7, bd: 0.9, sn: 0.8, ht: 0.7, lt: 0.7, cy: 0.6, rd: 0.6, ft: 0.7 };
 let activePreset = 0;
 
@@ -1217,13 +1219,14 @@ setupBpmBtn('bpm-inc', +10);
 
 // Custom vertical sliders
 function initVolSliders() {
+  let activeWrap = null; // 現在ドラッグ中のスライダー
+
   document.querySelectorAll('.vol-slider-wrap').forEach(wrap => {
     const key = wrap.dataset.vol;
     const hiddenInput = document.getElementById('vol-' + key);
     const thumb = wrap.querySelector('.vol-thumb');
     const fill = wrap.querySelector('.vol-fill');
 
-    // Use restored vols value if available
     if (vols[key] != null) hiddenInput.value = vols[key];
 
     function setVal(v) {
@@ -1235,37 +1238,44 @@ function initVolSliders() {
       updateVol();
     }
 
-    // Init position
     setVal(parseFloat(hiddenInput.value));
 
-    function getValFromEvent(e) {
+    function getValFromY(clientY) {
       const rect = wrap.getBoundingClientRect();
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const ratio = 1 - (clientY - rect.top) / rect.height;
-      return ratio;
+      return 1 - (clientY - rect.top) / rect.height;
     }
 
-    let dragging = false;
     wrap.addEventListener('mousedown', e => {
-      dragging = true;
-      setVal(getValFromEvent(e));
+      activeWrap = wrap;
+      setVal(getValFromY(e.clientY));
       e.preventDefault();
     });
-    document.addEventListener('mousemove', e => {
-      if (dragging) setVal(getValFromEvent(e));
-    });
-    document.addEventListener('mouseup', () => { dragging = false; });
 
     wrap.addEventListener('touchstart', e => {
-      dragging = true;
-      setVal(getValFromEvent(e));
+      activeWrap = wrap;
+      setVal(getValFromY(e.touches[0].clientY));
       e.preventDefault();
     }, { passive: false });
-    document.addEventListener('touchmove', e => {
-      if (dragging) { setVal(getValFromEvent(e)); e.preventDefault(); }
-    }, { passive: false });
-    document.addEventListener('touchend', () => { dragging = false; });
+
+    // setVal をwrapに紐付けて外からアクセスできるようにする
+    wrap._setVal = setVal;
+    wrap._getValFromY = getValFromY;
   });
+
+  // mousemove/touchmove はdocumentに1回だけ登録
+  document.addEventListener('mousemove', e => {
+    if (!activeWrap) return;
+    activeWrap._setVal(activeWrap._getValFromY(e.clientY));
+  });
+  document.addEventListener('mouseup', () => { activeWrap = null; });
+
+  document.addEventListener('touchmove', e => {
+    if (!activeWrap) return;
+    activeWrap._setVal(activeWrap._getValFromY(e.touches[0].clientY));
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchend', () => { activeWrap = null; });
+  document.addEventListener('touchcancel', () => { activeWrap = null; });
 }
 initVolSliders();
 </script>
