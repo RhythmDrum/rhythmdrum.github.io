@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "io.github.rhythmdrum",
+        "package_name": "io.github.rhythmdrum.twa",
         "sha256_cert_fingerprints": ["3B:E8:6A:C7:26:FF:96:93:D9:AB:1F:A9:E8:8D:AF:F9:CD:F5:84:DC:89:FD:8B:9B:6E:52:54:43:C9:F6:74:82"]
       }
     }]
