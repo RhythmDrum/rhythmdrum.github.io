@@ -1063,7 +1063,7 @@ function scheduleStep(stepIdx, time) {
   const delay = (time - audioCtx.currentTime) * 1000;
   const thisStep = stepIdx;
   const stepDuration = getStepInterval();
-  const ledInterval = (beatMode === 16 || beatMode === 32) ? 4 : 1;
+  const ledInterval = beatMode / 4; // 1拍あたりのステップ数（カウントインと同じ間隔）
   const flashLed = (thisStep % ledInterval === 0);
   setTimeout(() => {
     const led = document.getElementById('beat-led');
