@@ -531,7 +531,7 @@ function scheduler() {
 }
 
 function startTimer() {
-  nextStepTime = audioCtx.currentTime + 0.05;
+  nextStepTime = audioCtx.currentTime + 0.15;
   if (countInEnabled) {
     const stepSecs = getStepInterval() / 1000;
     const stepsPerBeat = beatMode / 4;
@@ -560,9 +560,9 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && isPlaying) acquireWakeLock();
 });
 
-function togglePlay() {
+async function togglePlay() {
   initAudio();
-  if(audioCtx.state==='suspended') audioCtx.resume();
+  if(audioCtx.state==='suspended') await audioCtx.resume();
   isPlaying = !isPlaying;
   const btn = document.getElementById('play-btn');
   const icon = document.getElementById('play-icon');
