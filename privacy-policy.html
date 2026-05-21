@@ -1,317 +1,409 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>プライバシーポリシー | RHYTHM DRUM</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プライバシーポリシー | RHYTHM DRUM</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Share+Tech+Mono&display=swap');
 
-  :root {
-    --bg: #0a0a0a;
-    --surface: #111111;
-    --border: #222222;
-    --accent: #ff3333;
-    --accent2: #ff6600;
-    --text: #e0e0e0;
-    --text-dim: #666666;
-    --text-bright: #ffffff;
-  }
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #2a2a2a;
+      --accent: #EF9F27;
+      --accent-dim: rgba(239,159,39,0.12);
+      --text: #e8e4d8;
+      --muted: #666;
+      --bd: #29AAEE;
+      --sn: #FF3D7F;
+      --hh: #4CD964;
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 300;
-    line-height: 1.8;
-    min-height: 100vh;
-  }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 300;
+      line-height: 1.9;
+      min-height: 100vh;
+    }
 
-  /* グリッドノイズ背景 */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,51,51,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,51,51,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+    /* ── ヘッダー ── */
+    header {
+      padding: 60px 24px 40px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
 
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 60px 24px 80px;
-  }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 20% 50%, rgba(41,170,238,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(255,61,127,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
 
-  /* ヘッダー */
-  header {
-    margin-bottom: 60px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 40px;
-  }
+    .app-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(28px, 6vw, 42px);
+      letter-spacing: 6px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
 
-  .app-label {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 13px;
-    letter-spacing: 0.3em;
-    color: var(--accent);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+    .drum-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .drum-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .dot-hh { background: var(--hh); box-shadow: 0 0 6px var(--hh); }
+    .dot-sn { background: var(--sn); box-shadow: 0 0 6px var(--sn); }
+    .dot-bd { background: var(--bd); box-shadow: 0 0 6px var(--bd); }
 
-  .app-label::before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 2px;
-    background: var(--accent);
-  }
+    .policy-title {
+      font-size: clamp(14px, 3vw, 18px);
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 400;
+    }
 
-  h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(36px, 8vw, 64px);
-    letter-spacing: 0.05em;
-    color: var(--text-bright);
-    line-height: 1;
-    margin-bottom: 20px;
-  }
+    /* ── メインコンテンツ ── */
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
 
-  .update-date {
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.1em;
-  }
+    /* 更新日 */
+    .meta {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* イントロ */
-  .intro {
-    background: var(--surface);
-    border-left: 3px solid var(--accent);
-    padding: 20px 24px;
-    margin-bottom: 48px;
-    font-size: 14px;
-    line-height: 1.9;
-    color: var(--text);
-  }
+    /* リード文 */
+    .lead {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 48px;
+      padding: 20px 24px;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-dim);
+      border-radius: 0 6px 6px 0;
+    }
 
-  /* セクション */
-  section {
-    margin-bottom: 44px;
-  }
+    /* セクション */
+    section {
+      margin-bottom: 44px;
+    }
 
-  .section-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
 
-  h2 {
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 500;
-    font-size: 17px;
-    color: var(--text-bright);
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-    letter-spacing: 0.05em;
-  }
+    .section-num {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      background: var(--accent-dim);
+      padding: 2px 8px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
 
-  p {
-    font-size: 14px;
-    color: var(--text);
-    margin-bottom: 12px;
-  }
+    h2 {
+      font-size: clamp(15px, 3vw, 17px);
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: var(--text);
+    }
 
-  ul {
-    list-style: none;
-    margin: 12px 0;
-  }
+    p {
+      font-size: 14px;
+      color: #b8b4a8;
+      margin-bottom: 12px;
+    }
 
-  ul li {
-    font-size: 14px;
-    color: var(--text);
-    padding: 6px 0 6px 20px;
-    position: relative;
-    border-bottom: 1px solid var(--border);
-  }
+    /* ハイライトボックス */
+    .highlight-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 16px 0;
+    }
 
-  ul li:last-child { border-bottom: none; }
+    .highlight-box.no-collect {
+      border-color: var(--hh);
+      background: rgba(76,217,100,0.05);
+    }
 
-  ul li::before {
-    content: '▸';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-size: 10px;
-    top: 8px;
-  }
+    .highlight-box.no-collect .box-title {
+      color: var(--hh);
+    }
 
-  /* 強調ボックス */
-  .highlight-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 16px 20px;
-    margin: 16px 0;
-    font-size: 14px;
-  }
+    .box-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
 
-  .highlight-box strong {
-    color: var(--accent2);
-    font-weight: 500;
-  }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
 
-  /* お問い合わせ */
-  .contact-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 28px;
-    margin-top: 48px;
-    position: relative;
-    overflow: hidden;
-  }
+    ul li {
+      font-size: 14px;
+      color: #b8b4a8;
+      padding: 5px 0 5px 18px;
+      position: relative;
+    }
 
-  .contact-section::before {
-    content: 'CONTACT';
-    position: absolute;
-    top: -10px;
-    right: 20px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 80px;
-    color: rgba(255,51,51,0.04);
-    letter-spacing: 0.1em;
-    line-height: 1;
-    pointer-events: none;
-  }
+    ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 12px;
+    }
 
-  .contact-section h2 {
-    border-color: var(--accent);
-  }
+    /* 区切り線 */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
 
-  .contact-section a {
-    color: var(--accent);
-    text-decoration: none;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(255,51,51,0.3);
-    transition: border-color 0.2s;
-  }
+    /* 連絡先 */
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
 
-  .contact-section a:hover {
-    border-color: var(--accent);
-  }
+    .contact-box a {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
 
-  /* フッター */
-  footer {
-    margin-top: 60px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
+    .contact-box a:hover {
+      text-decoration: underline;
+    }
 
-  .footer-brand {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-  }
+    /* フッター */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+    }
 
-  .footer-copy {
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-  }
-</style>
+    footer p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 480px) {
+      header { padding: 40px 16px 32px; }
+      main { padding: 32px 16px 60px; }
+      .highlight-box { padding: 16px 18px; }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
 
-  <header>
-    <div class="app-label">RHYTHM DRUM</div>
-    <h1>プライバシー<br>ポリシー</h1>
-    <div class="update-date">最終更新日：2026年5月17日</div>
-  </header>
-
-  <div class="intro">
-    RHYTHM DRUM（以下「本アプリ」）をご利用いただきありがとうございます。本アプリの開発者（以下「開発者」）は、ユーザーのプライバシーを尊重し、個人情報の保護に努めています。本プライバシーポリシーは、本アプリにおける情報の取り扱いについて説明するものです。
+<header>
+  <p class="app-name">RHYTHM DRUM</p>
+  <div class="drum-dots">
+    <span class="drum-dots-item dot-hh"></span>
+    <span class="drum-dots-item dot-sn"></span>
+    <span class="drum-dots-item dot-bd"></span>
+    <span class="drum-dots-item dot-hh"></span>
+    <span class="drum-dots-item dot-sn"></span>
+    <span class="drum-dots-item dot-bd"></span>
+    <span class="drum-dots-item dot-hh"></span>
+    <span class="drum-dots-item dot-sn"></span>
   </div>
+  <p class="policy-title">Privacy Policy</p>
+</header>
 
+<main>
+
+  <p class="meta">最終更新日 / Last updated: 2025年1月</p>
+
+  <p class="lead">
+    本プライバシーポリシーは、RHYTHM DRUM（以下「本アプリ」）における個人情報の取り扱いについて説明するものです。開発者は、ユーザーのプライバシーを最大限に尊重することをお約束します。
+  </p>
+
+  <!-- 1. 情報の収集 -->
   <section>
-    <div class="section-number">01</div>
-    <h2>収集する情報</h2>
-    <div class="highlight-box">
-      <strong>本アプリは、個人を特定できる情報を一切収集しません。</strong>
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>収集する情報について</h2>
     </div>
-    <p>本アプリはリズムシーケンサーアプリであり、以下の情報のみをお使いの端末内に保存します：</p>
+
+    <div class="highlight-box no-collect">
+      <p class="box-title">✓ 個人情報は一切収集しません</p>
+      <p>本アプリは、氏名・メールアドレス・位置情報・連絡先などの個人を特定できる情報を収集・保存・送信しません。</p>
+    </div>
+
+    <p>本アプリが端末内に保存するデータは以下のみです：</p>
+
+    <div class="highlight-box">
+      <p class="box-title">端末内にのみ保存されるデータ</p>
+      <ul>
+        <li>BPM（テンポ）設定</li>
+        <li>ビートモード（4 / 8 / 16ステップ）</li>
+        <li>ドラムパターン（ステップのオン/オフ状態）</li>
+        <li>プリセット内容（最大8スロット）</li>
+        <li>各楽器の音量設定</li>
+        <li>カウントイン・リピートの設定</li>
+      </ul>
+    </div>
+
+    <p>これらのデータはすべて、お使いのデバイス上の <strong>ローカルストレージ（localStorage）</strong> にのみ保存されます。外部サーバーやクラウドには一切送信されません。</p>
+  </section>
+
+  <hr>
+
+  <!-- 2. サードパーティ -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>サードパーティサービスについて</h2>
+    </div>
+
+    <div class="highlight-box no-collect">
+      <p class="box-title">✓ 広告・アナリティクス・トラッキングなし</p>
+      <p>本アプリは、広告SDK・アクセス解析・トラッキングライブラリを一切使用していません。</p>
+    </div>
+
+    <p>本アプリは以下のサードパーティサービスを利用しません：</p>
     <ul>
-      <li>リズムパターンのプリセットデータ（端末のローカルストレージに保存）</li>
-      <li>アプリの設定情報（端末のローカルストレージに保存）</li>
-    </ul>
-    <p>これらのデータは端末外部に送信されることはなく、開発者がアクセスすることもできません。</p>
-  </section>
-
-  <section>
-    <div class="section-number">02</div>
-    <h2>第三者へのデータ提供</h2>
-    <p>本アプリは、ユーザーのデータを第三者に販売・提供・開示することは一切ありません。</p>
-  </section>
-
-  <section>
-    <div class="section-number">03</div>
-    <h2>広告・アナリティクス</h2>
-    <p>本アプリは広告を表示せず、Google Analyticsなどのアナリティクスツールを使用していません。</p>
-  </section>
-
-  <section>
-    <div class="section-number">04</div>
-    <h2>インターネット接続について</h2>
-    <p>本アプリはPWA（Progressive Web App）として動作します。初回起動時および更新時にインターネット接続を使用しますが、音声生成・リズム再生などの主要機能はオフラインでも動作します。</p>
-    <ul>
-      <li>サーバーへのユーザーデータ送信は行いません</li>
-      <li>アプリファイルのキャッシュのみ端末に保存されます</li>
+      <li>広告ネットワーク（Google AdMob等）</li>
+      <li>アクセス解析（Firebase Analytics, Google Analytics等）</li>
+      <li>クラッシュレポート収集サービス</li>
+      <li>ソーシャルログイン</li>
+      <li>その他の外部APIやSDK</li>
     </ul>
   </section>
 
+  <hr>
+
+  <!-- 3. インターネット通信 -->
   <section>
-    <div class="section-number">05</div>
-    <h2>お子様のプライバシー</h2>
-    <p>本アプリは13歳未満のお子様から意図的に個人情報を収集することはありません。本アプリは年齢に関わらずご利用いただけるリズムアプリです。</p>
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>インターネット通信について</h2>
+    </div>
+
+    <p>本アプリはドラムシーケンサーとして完全にオフラインで動作します。ユーザーの操作・設定データ・生成した音楽パターンがインターネットを通じて外部に送信されることは一切ありません。</p>
+
+    <p>アプリ自体の初回読み込みにはインターネット接続が必要な場合がありますが、その後はキャッシュ（Service Worker）によってオフラインでも利用可能です。</p>
   </section>
 
+  <hr>
+
+  <!-- 4. 権限 -->
   <section>
-    <div class="section-number">06</div>
-    <h2>プライバシーポリシーの変更</h2>
-    <p>本ポリシーは必要に応じて更新されることがあります。変更があった場合は、本ページにて最新版を公開します。重大な変更がある場合は、アプリ内でお知らせします。</p>
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>必要な権限について</h2>
+    </div>
+
+    <p>本アプリが必要とする主な権限は以下のとおりです：</p>
+
+    <div class="highlight-box">
+      <p class="box-title">使用する権限</p>
+      <ul>
+        <li><strong>インターネット</strong>（INTERNET）— アプリの初回配信・Service Workerの登録に使用</li>
+        <li><strong>画面のスリープ防止</strong>（WAKE_LOCK）— 演奏中に画面がスリープしないよう使用</li>
+      </ul>
+    </div>
+
+    <p>カメラ・マイク・位置情報・連絡先・ストレージ（外部）などの機密性の高い権限は一切要求しません。</p>
   </section>
 
-  <div class="contact-section">
-    <div class="section-number">07</div>
-    <h2>お問い合わせ</h2>
+  <hr>
+
+  <!-- 5. 子供のプライバシー -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>お子様のプライバシーについて</h2>
+    </div>
+
+    <p>本アプリは個人情報を収集しないため、13歳未満のお子様であっても安全にご利用いただけます。開発者は意図的に未成年者の個人情報を収集することはありません。</p>
+  </section>
+
+  <hr>
+
+  <!-- 6. ポリシーの変更 -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>プライバシーポリシーの変更について</h2>
+    </div>
+
+    <p>本ポリシーは必要に応じて更新される場合があります。変更があった場合は、このページの「最終更新日」を更新します。定期的にご確認いただくことをお勧めします。</p>
+
+    <p>重要な変更が行われた際は、アプリのアップデートノートにてお知らせします。</p>
+  </section>
+
+  <hr>
+
+  <!-- 7. お問い合わせ -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2>お問い合わせ</h2>
+    </div>
+
     <p>本プライバシーポリシーに関するご質問は、GitHubリポジトリのIssuesよりお問い合わせください。</p>
-    <p style="margin-top:12px;">
-      <a href="https://github.com/rhythmdrum/rhythmdrum.github.io/issues" target="_blank">
-        https://github.com/rhythmdrum/rhythmdrum.github.io/issues
-      </a>
-    </p>
-  </div>
 
-  <footer>
-    <div class="footer-brand">RHYTHM DRUM</div>
-    <div class="footer-copy">© 2026 RHYTHM DRUM. All rights reserved.</div>
-  </footer>
+    <div class="contact-box">
+      <p class="box-title">Contact</p>
+      <p><a href="https://github.com/rhythmdrum/rhythmdrum.github.io/issues">https://github.com/rhythmdrum/rhythmdrum.github.io/issues</a></p>
+    </div>
+  </section>
 
-</div>
+</main>
+
+<footer>
+  <p>&copy; 2026 RHYTHM DRUM &nbsp;—&nbsp; All rights reserved</p>
+</footer>
+
 </body>
 </html>
