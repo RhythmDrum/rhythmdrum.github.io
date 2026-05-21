@@ -13,7 +13,7 @@
   <link rel="icon" type="image/png" href="./any-favicon.png" sizes="192x192">
   <title>RHYTHM DRUM</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
   --bd: #29AAEE; --sn: #FF3D7F; --hh: #4CD964;
   --bg-main: #000000; --bg-cell: #222222;
@@ -21,7 +21,7 @@
 }
 html { background: #000; }
 body { background: #000; font-family: 'Helvetica Neue', Arial, Meiryo, sans-serif; }
-.rd-wrap { background: #000; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)) 20px; color: var(--text-primary); user-select: none; }
+.rd-wrap { background: #000; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)) 20px; color: var(--text-primary); user-select: none; max-width: 1000px; margin: 0 auto; }
 .rd-led { width: 10px; height: 10px; border-radius: 50%; background: #333; transition: background 0.05s, box-shadow 0.05s; display: inline-block; }
 .rd-led.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 .controls-col { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; }
@@ -85,7 +85,7 @@ body.playing .cell.on-hh.current { background: #4CD964; box-shadow: none; }
 .toast.show { opacity: 1; }
 .footer { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 12px; }
 .rd-title { font-size: 22px; letter-spacing:1.5px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-.play-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); }
+.play-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--accent); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; color: var(--accent); -webkit-tap-highlight-color: transparent; outline: none; }
 .play-btn:hover { background: rgba(239,159,39,0.1); }
 .play-btn.playing { background: var(--accent); color: #000; }
 .beat-controls-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -432,7 +432,8 @@ function scheduleClick(t) {
 // BD: Classic Rock Kick
 function playKick(t) {
   const g = audioCtx.createGain();
-  g.gain.setValueAtTime(vols.bd*1.2,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+  // 初期ゲインの1.2倍乗算を除去：タイミングがずれた際のクリップ（ボッ音）を防ぐ
+  g.gain.setValueAtTime(vols.bd, t); g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
   g.connect(audioCtx.destination);
   const osc = audioCtx.createOscillator();
   osc.frequency.setValueAtTime(160,t); osc.frequency.exponentialRampToValueAtTime(40,t+0.15);
@@ -531,7 +532,9 @@ function scheduler() {
 }
 
 function startTimer() {
-  nextStepTime = audioCtx.currentTime + 0.15;
+  // オフセットを0.3sに拡大：resume()直後でもゲインのランプが確実に機能し
+  // 最初の音が「ボッ」と大きく鳴るクリックノイズを防ぐ
+  nextStepTime = audioCtx.currentTime + 0.3;
   if (countInEnabled) {
     const stepSecs = getStepInterval() / 1000;
     const stepsPerBeat = beatMode / 4;
@@ -562,7 +565,12 @@ document.addEventListener('visibilitychange', () => {
 
 async function togglePlay() {
   initAudio();
-  if(audioCtx.state==='suspended') await audioCtx.resume();
+  if (audioCtx.state === 'suspended') {
+    await audioCtx.resume();
+    // resume()完了後、AudioContextのcurrentTimeが正しく進み始めるまで
+    // 少し待機してからスケジューラを開始することで、最初の音の「ボッ」を防ぐ
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
   isPlaying = !isPlaying;
   const btn = document.getElementById('play-btn');
   const icon = document.getElementById('play-icon');
